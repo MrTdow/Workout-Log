@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7d58">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Workout Tracker">
+  <title>Workout Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div>
+        <p class="eyebrow">Sports performance</p>
+        <h1>Workout Tracker</h1>
+      </div>
+      <button class="icon-button" id="quickAddMovement" aria-label="Add exercise">+</button>
+    </header>
+
+    <section class="athlete-switcher" aria-label="Athlete profile">
+      <div class="athlete-main">
+        <div class="avatar" id="activeAthleteAvatar">ME</div>
+        <label class="compact-field">
+          <span>Athlete</span>
+          <select id="athleteSelect"></select>
+        </label>
+      </div>
+      <label class="toggle-pill">
+        <input type="checkbox" id="coachModeToggle">
+        <span>Coach Mode</span>
+      </label>
+    </section>
+
+    <main>
+      <section class="summary-strip" aria-label="Workout summary">
+        <article>
+          <span id="totalSessions">0</span>
+          <p>Sessions</p>
+        </article>
+        <article>
+          <span id="thisWeekSessions">0</span>
+          <p>This week</p>
+        </article>
+        <article>
+          <span id="trackedMovements">0</span>
+          <p>Exercises</p>
+        </article>
+      </section>
+
+      <section class="coach-panel" id="coachPanel" hidden>
+        <div class="section-heading compact">
+          <h2>Coach View</h2>
+        </div>
+        <div class="coach-grid" id="coachGrid"></div>
+      </section>
+
+      <section class="view is-active" id="trackView" data-view="track">
+        <div class="section-heading">
+          <div>
+            <h2>Log Workout</h2>
+            <p>Tap an exercise, enter the result, save fast.</p>
+          </div>
+        </div>
+
+        <div class="quick-section">
+          <div class="section-heading compact">
+            <h2>Quick Add</h2>
+          </div>
+          <div class="chip-row" id="quickExerciseButtons"></div>
+        </div>
+
+        <label class="field">
+          <span>Exercise</span>
+          <select id="logMovementSelect"></select>
+        </label>
+        <button class="secondary-button picker-open-button" id="openMovementPicker" type="button">Search Exercise Library</button>
+
+        <form class="panel log-panel" id="logForm">
+          <label class="field">
+            <span>Date</span>
+            <input type="date" id="logDate" required>
+          </label>
+
+          <div class="log-fields" id="logFields"></div>
+
+          <div class="suggestion-strip" id="autofillSuggestions"></div>
+
+          <label class="field">
+            <span>How hard was it?</span>
+            <input type="range" id="logEffort" min="1" max="10" value="7">
+            <strong class="range-value"><span id="effortValue">7</span>/10</strong>
+          </label>
+
+          <label class="field">
+            <span>Notes</span>
+            <textarea id="logNotes" rows="3" placeholder="Form notes, PRs, how you felt..."></textarea>
+          </label>
+
+          <button class="primary-button form-save-button" type="submit">Save Result</button>
+        </form>
+
+        <section class="recent-panel">
+          <div class="section-heading compact split-heading">
+            <h2>Recent Results</h2>
+            <button class="small-button" id="duplicateLastWorkout" type="button">Duplicate Last</button>
+          </div>
+          <div class="result-list" id="recentResults"></div>
+        </section>
+      </section>
+
+      <section class="view" id="progressView" data-view="progress">
+        <div class="section-heading">
+          <div>
+            <h2>Progress</h2>
+            <p>Review one exercise at a time.</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>Exercise</span>
+          <select id="progressMovementSelect"></select>
+        </label>
+
+        <section class="progress-grid">
+          <article>
+            <span id="progressBest">--</span>
+            <p>Best result</p>
+          </article>
+          <article>
+            <span id="progressPreviousBest">--</span>
+            <p>Previous best</p>
+          </article>
+          <article>
+            <span id="progressTrend">--</span>
+            <p>Trend</p>
+          </article>
+        </section>
+
+        <div class="chart-panel">
+          <canvas id="progressChart" aria-label="Progress chart"></canvas>
+          <div class="chart-tooltip" id="chartTooltip" hidden></div>
+        </div>
+
+        <div class="result-list" id="movementHistory"></div>
+      </section>
+
+      <section class="view" id="movementsView" data-view="movements">
+        <div class="section-heading">
+          <div>
+            <h2>Exercises</h2>
+            <p>Add movements, favorites, and benchmarks.</p>
+          </div>
+        </div>
+
+        <form class="panel" id="movementForm">
+          <input type="hidden" id="movementId">
+          <label class="field">
+            <span>Exercise name</span>
+            <input type="text" id="movementName" placeholder="Back squat, mile run, push-ups..." required>
+          </label>
+          <label class="field">
+            <span>Category</span>
+            <input type="text" id="movementCategory" placeholder="Strength, cardio, benchmark...">
+          </label>
+          <label class="field">
+            <span>Main progress number</span>
+            <select id="movementPrimaryMetric">
+              <option value="estimatedMax">Estimated max</option>
+              <option value="weight">Weight</option>
+              <option value="reps">Reps</option>
+              <option value="time">Time</option>
+              <option value="distance">Distance</option>
+            </select>
+          </label>
+          <label class="favorite-toggle">
+            <input type="checkbox" id="movementFavorite">
+            <span>Favorite exercise</span>
+          </label>
+          <fieldset class="metric-picker">
+            <legend>Fields to show when logging</legend>
+            <label><input type="checkbox" name="metric" value="sets" checked> Sets</label>
+            <label><input type="checkbox" name="metric" value="reps" checked> Reps</label>
+            <label><input type="checkbox" name="metric" value="weight" checked> Weight</label>
+            <label><input type="checkbox" name="metric" value="time"> Time</label>
+            <label><input type="checkbox" name="metric" value="distance"> Distance</label>
+          </fieldset>
+          <div class="button-row">
+            <button class="primary-button" type="submit">Save Exercise</button>
+            <button class="secondary-button" type="button" id="cancelMovementEdit">Cancel</button>
+          </div>
+        </form>
+
+        <section class="benchmark-panel">
+          <div class="section-heading compact">
+            <h2>Benchmark Workouts</h2>
+          </div>
+          <div class="chip-row" id="benchmarkButtons"></div>
+        </section>
+
+        <section class="library-panel">
+          <div class="section-heading compact">
+            <div>
+              <h2>Exercise Library</h2>
+              <p>Search, favorite, or tap an exercise to log it.</p>
+            </div>
+          </div>
+          <label class="field">
+            <span>Search movements</span>
+            <input type="search" id="movementSearch" placeholder="Search squat, run, sled, plank...">
+          </label>
+          <div class="library-tabs" id="libraryTabs" aria-label="Exercise library tabs"></div>
+          <div class="chip-row" id="categoryFilters"></div>
+          <section class="picker-section">
+            <h3>Most Used</h3>
+            <div class="chip-row" id="libraryMostUsed"></div>
+          </section>
+        </section>
+
+        <div class="movement-list" id="movementList"></div>
+      </section>
+
+      <section class="view" id="settingsView" data-view="settings">
+        <div class="section-heading">
+          <div>
+            <h2>Settings</h2>
+            <p>Profiles, display, units, backup, and future sync.</p>
+          </div>
+        </div>
+
+        <section class="panel settings-stack">
+          <h3>Athlete Profiles</h3>
+          <form class="inline-form" id="athleteForm">
+            <input type="text" id="athleteName" placeholder="Athlete name" required>
+            <button class="secondary-button" type="submit">Add</button>
+          </form>
+          <div class="profile-list" id="profileList"></div>
+        </section>
+
+        <section class="panel settings-stack">
+          <h3>App Preferences</h3>
+          <label class="setting-row">
+            <span>Dark mode</span>
+            <input type="checkbox" id="darkModeToggle">
+          </label>
+          <label class="setting-row">
+            <span>Units</span>
+            <select id="unitSelect">
+              <option value="lb">Pounds (lb)</option>
+              <option value="kg">Kilograms (kg)</option>
+            </select>
+          </label>
+          <div class="sync-placeholder">
+            <strong>Data sync</strong>
+            <p>Supabase sync can be connected here later. For now, data stays private on this device.</p>
+          </div>
+        </section>
+
+        <section class="panel backup-panel">
+          <button class="primary-button" id="exportData" type="button">Export Backup</button>
+          <label class="secondary-button file-button">
+            Import Backup
+            <input type="file" id="importData" accept="application/json">
+          </label>
+          <button class="danger-button" id="clearData" type="button">Clear All Data</button>
+        </section>
+      </section>
+    </main>
+
+    <button class="sticky-save" id="stickySaveResult" type="button">Save Result</button>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="is-active" data-nav="track">Log</button>
+      <button data-nav="progress">Progress</button>
+      <button data-nav="movements">Exercises</button>
+      <button data-nav="settings">Settings</button>
+    </nav>
+  </div>
+
+  <dialog class="movement-picker" id="movementPicker">
+    <div class="picker-sheet">
+      <div class="picker-header">
+        <div>
+          <p class="eyebrow">Exercise library</p>
+          <h2>Choose Movement</h2>
+        </div>
+        <button class="small-button" id="closeMovementPicker" type="button">Close</button>
+      </div>
+      <label class="field">
+        <span>Search</span>
+        <input type="search" id="pickerSearch" placeholder="Type to filter exercises...">
+      </label>
+      <div class="library-tabs" id="pickerTabs" aria-label="Exercise picker tabs"></div>
+      <section class="picker-section">
+        <h3>Favorites</h3>
+        <div class="chip-row" id="pickerFavorites"></div>
+      </section>
+      <section class="picker-section">
+        <h3>Recent</h3>
+        <div class="chip-row" id="pickerRecent"></div>
+      </section>
+      <section class="picker-section">
+        <h3>Most Used</h3>
+        <div class="chip-row" id="pickerMostUsed"></div>
+      </section>
+      <div class="picker-results" id="pickerResults"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
