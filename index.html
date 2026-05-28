@@ -23,20 +23,6 @@
       <button class="icon-button" id="quickAddMovement" aria-label="Add exercise">+</button>
     </header>
 
-    <section class="athlete-switcher" aria-label="Athlete profile">
-      <div class="athlete-main">
-        <div class="avatar" id="activeAthleteAvatar">ME</div>
-        <label class="compact-field">
-          <span>Athlete</span>
-          <select id="athleteSelect"></select>
-        </label>
-      </div>
-      <label class="toggle-pill">
-        <input type="checkbox" id="coachModeToggle">
-        <span>Coach Mode</span>
-      </label>
-    </section>
-
     <main>
       <section class="summary-strip" aria-label="Workout summary">
         <article>
@@ -51,13 +37,6 @@
           <span id="trackedMovements">0</span>
           <p>Exercises</p>
         </article>
-      </section>
-
-      <section class="coach-panel" id="coachPanel" hidden>
-        <div class="section-heading compact">
-          <h2>Coach View</h2>
-        </div>
-        <div class="coach-grid" id="coachGrid"></div>
       </section>
 
       <section class="view is-active" id="trackView" data-view="track">
@@ -150,6 +129,43 @@
         <div class="result-list" id="movementHistory"></div>
       </section>
 
+      <section class="view" id="workoutsView" data-view="workouts">
+        <div class="section-heading">
+          <div>
+            <h2>Workouts</h2>
+            <p>Pick a workout, train, and log it.</p>
+          </div>
+        </div>
+
+        <section class="workout-detail panel" id="databaseWorkoutDetail" hidden></section>
+
+        <section id="workoutBrowse">
+          <label class="field">
+            <span>Search workouts</span>
+            <input type="search" id="workoutSearch" placeholder="Search jump, strength, conditioning...">
+          </label>
+
+          <div class="library-tabs workout-difficulty-tabs" id="workoutDifficultyFilters" aria-label="Workout difficulty filters"></div>
+          <div class="chip-row" id="workoutCategoryFilters" aria-label="Workout categories"></div>
+
+          <section class="quick-section">
+            <div class="section-heading compact">
+              <h2>Favorites</h2>
+            </div>
+            <div class="chip-row" id="favoriteWorkoutChips"></div>
+          </section>
+
+          <section class="quick-section">
+            <div class="section-heading compact">
+              <h2>Recently Completed</h2>
+            </div>
+            <div class="chip-row" id="recentWorkoutChips"></div>
+          </section>
+
+          <div class="database-workout-list" id="databaseWorkoutList"></div>
+        </section>
+      </section>
+
       <section class="view" id="movementsView" data-view="movements">
         <div class="section-heading">
           <div>
@@ -203,6 +219,49 @@
           <div class="chip-row" id="benchmarkButtons"></div>
         </section>
 
+        <section class="panel workout-builder">
+          <details id="workoutBuilderDetails">
+            <summary>
+              <span>
+                <strong>Custom Workouts</strong>
+                <small>Save workouts made from multiple movements.</small>
+              </span>
+            </summary>
+            <form id="workoutForm">
+            <input type="hidden" id="workoutId">
+            <label class="field">
+              <span>Workout name</span>
+              <input type="text" id="workoutName" placeholder="4 rounds for time" required>
+            </label>
+            <div class="workout-form-grid">
+              <label class="field">
+                <span>Format</span>
+                <select id="workoutFormat">
+                  <option value="time">For time</option>
+                  <option value="amrap">AMRAP</option>
+                  <option value="emom">EMOM</option>
+                  <option value="rounds">Rounds/reps</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Rounds or duration</span>
+                <input type="text" id="workoutRounds" placeholder="4 rounds, 12 min, etc.">
+              </label>
+            </div>
+            <label class="field">
+              <span>Movements</span>
+              <textarea id="workoutMovements" rows="4" placeholder="10 burpees&#10;20 push-ups&#10;50 air squats" required></textarea>
+            </label>
+            <div class="button-row">
+              <button class="primary-button" type="submit">Save Workout</button>
+              <button class="secondary-button" type="button" id="cancelWorkoutEdit">Cancel</button>
+            </div>
+            </form>
+          </details>
+          <div class="workout-list" id="workoutList"></div>
+        </section>
+
         <section class="library-panel">
           <div class="section-heading compact">
             <div>
@@ -229,18 +288,9 @@
         <div class="section-heading">
           <div>
             <h2>Settings</h2>
-            <p>Profiles, display, units, backup, and future sync.</p>
+            <p>Display, units, and backups.</p>
           </div>
         </div>
-
-        <section class="panel settings-stack">
-          <h3>Athlete Profiles</h3>
-          <form class="inline-form" id="athleteForm">
-            <input type="text" id="athleteName" placeholder="Athlete name" required>
-            <button class="secondary-button" type="submit">Add</button>
-          </form>
-          <div class="profile-list" id="profileList"></div>
-        </section>
 
         <section class="panel settings-stack">
           <h3>App Preferences</h3>
@@ -255,10 +305,7 @@
               <option value="kg">Kilograms (kg)</option>
             </select>
           </label>
-          <div class="sync-placeholder">
-            <strong>Data sync</strong>
-            <p>Supabase sync can be connected here later. For now, data stays private on this device.</p>
-          </div>
+          <p class="device-note">Your workout data is saved on this device only. Export a backup if you switch phones or browsers.</p>
         </section>
 
         <section class="panel backup-panel">
@@ -277,6 +324,7 @@
     <nav class="bottom-nav" aria-label="Main navigation">
       <button class="is-active" data-nav="track">Log</button>
       <button data-nav="progress">Progress</button>
+      <button data-nav="workouts">Workouts</button>
       <button data-nav="movements">Exercises</button>
       <button data-nav="settings">Settings</button>
     </nav>

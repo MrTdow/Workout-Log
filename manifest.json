@@ -1,7 +1,7 @@
 {
   "name": "Workout Tracker",
   "short_name": "Workout",
-  "description": "A fast mobile workout tracker for athletes and coaches.",
+  "description": "A fast mobile workout tracker for logging results, workout database training, and progress.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f7f2",

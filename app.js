@@ -1,6 +1,6 @@
 (function () {
-  const STORAGE_KEY = "workoutTracker.v2";
-  const LEGACY_KEY = "workoutTracker.v1";
+  const STORAGE_KEY = "workoutTracker.v5";
+  const LEGACY_KEYS = ["workoutTracker.v4", "workoutTracker.v3", "workoutTracker.v2", "workoutTracker.v1"];
 
   const metricLabels = {
     sets: "Sets",
@@ -27,6 +27,45 @@
     { name: "Annie", metrics: ["time"], primaryMetric: "time" },
     { name: "Diane", metrics: ["time"], primaryMetric: "time" },
     { name: "Fight Gone Bad", metrics: ["reps"], primaryMetric: "reps" }
+  ];
+
+  const workoutCategories = [
+    "All", "Favorites", "Recent", "Basketball Strength", "Explosive Power", "Vertical Jump",
+    "Upper Body", "Lower Body", "Full Body", "Conditioning", "Recovery", "Core", "Mobility"
+  ];
+  const workoutDifficulties = ["All", "Beginner", "Intermediate", "Advanced"];
+
+  const workoutDatabase = [
+    workoutTemplate("db-lower-strength", "Basketball Lower Body Strength", "Basketball Strength", "Advanced", "60 min", ["Back Squat 5x5, rest 2-3 min", "Romanian Deadlift 4x8, rest 90 sec", "Bulgarian Split Squat 3x10 each leg", "Calf Raises 3x15", "Tibialis Raises 3x15"], "Heavy lower-body day for force production."),
+    workoutTemplate("db-explosive-jump", "Explosive Jump Day", "Explosive Power", "Advanced", "50 min", ["Hang Clean 5x3, rest 2 min", "Box Jumps 5x5", "Depth Jumps 4x4", "Broad Jumps 4x5", "Sled Push 5 rounds"], "Keep every rep fast and crisp."),
+    workoutTemplate("db-upper-power", "Upper Body Power", "Upper Body", "Intermediate", "55 min", ["Bench Press 5x5", "Pull-Ups 4xMax", "Dumbbell Bench 3x10", "Landmine Press 3x8 each side", "Farmer Carry 4 rounds"], "Build contact strength and upper-body power."),
+    workoutTemplate("db-basketball-conditioning", "Basketball Conditioning", "Conditioning", "Advanced", "40 min", ["Suicides x10", "Assault Bike Intervals 8 rounds", "Tempo Runs 6x100m", "Agility Ladder 5 min", "Defensive Slides 6 rounds"], "Game-speed conditioning with full focus."),
+    workoutTemplate("db-core-stability", "Core & Stability", "Core", "Beginner", "30 min", ["Plank 3x45 sec", "Side Plank 3x30 sec each", "Pallof Press 3x12", "Russian Twists 3x20", "Hanging Leg Raises 3x10"], "Brace hard and move with control."),
+    workoutTemplate("db-vertical-base", "Vertical Jump Base", "Vertical Jump", "Intermediate", "45 min", ["Trap Bar Deadlift 4x5", "Split Squat 3x8 each", "Pogo Jumps 4x20", "Approach Jumps 5x3", "Calf Iso Holds 3x30 sec"], "Strength plus elastic ankle work."),
+    workoutTemplate("db-speed-strength", "Speed Strength Primer", "Explosive Power", "Intermediate", "35 min", ["Power Clean 6x2", "Med Ball Chest Pass 4x5", "Med Ball Slam 4x6", "Band-Resisted Jumps 4x4", "Sprint Starts 6x10m"], "Low volume, high intent."),
+    workoutTemplate("db-upper-hypertrophy", "Upper Body Builder", "Upper Body", "Intermediate", "50 min", ["Incline Bench Press 4x8", "Seated Row 4x10", "Dumbbell Shoulder Press 3x10", "Lat Pulldown 3x12", "Push-Ups 3xMax"], "Steady accessory work for durability."),
+    workoutTemplate("db-lower-accessory", "Lower Body Accessories", "Lower Body", "Beginner", "40 min", ["Goblet Squat 4x10", "Single-Leg RDL 3x10 each", "Step-Ups 3x10 each", "Hamstring Curl 3x12", "Wall Sit 3x45 sec"], "Clean reps and balance side to side."),
+    workoutTemplate("db-full-body-strength", "Full Body Strength", "Full Body", "Intermediate", "55 min", ["Front Squat 4x5", "Bench Press 4x6", "Pull-Ups 4xMax", "Kettlebell Swing 4x12", "Farmer Carry 3 rounds"], "Simple full-body strength day."),
+    workoutTemplate("db-recovery-flow", "Recovery Flow", "Recovery", "Beginner", "25 min", ["Easy Bike 8 min", "Couch Stretch 2 min each", "Hamstring Stretch 2 min each", "Thoracic Rotation 2x10", "Foam Rolling 6 min"], "Keep it easy and leave fresher."),
+    workoutTemplate("db-hip-mobility", "Hip & Ankle Mobility", "Mobility", "Beginner", "22 min", ["Ankle Mobility 3x10 each", "Hip Flexor Stretch 2 min each", "90/90 Switches 3x8", "Cossack Squat 3x6 each", "Deep Squat Hold 3x45 sec"], "Great before lower-body training."),
+    workoutTemplate("db-core-rotation", "Rotational Core", "Core", "Intermediate", "32 min", ["Cable Chop 3x12 each", "Pallof Press 3x12 each", "Med Ball Rotational Throw 4x5 each", "Dead Bug 3x10 each", "Side Plank Reach 3x8 each"], "Control rotation before adding speed."),
+    workoutTemplate("db-court-repeat", "Court Repeat Sprints", "Conditioning", "Intermediate", "35 min", ["Warm-Up Jog 5 min", "Full-Court Sprint 10 reps", "Backpedal to Sprint 6 reps", "Defensive Slide Shuttle 6 reps", "Cooldown Walk 5 min"], "Rest enough to keep quality high."),
+    workoutTemplate("db-jump-landing", "Jump Landing Control", "Vertical Jump", "Beginner", "35 min", ["Snap Downs 4x5", "Box Jump 4x4", "Single-Leg Landing 3x5 each", "Lateral Bounds 3x6 each", "Calf Raises 3x15"], "Quiet landings, strong positions."),
+    workoutTemplate("db-heavy-posterior", "Posterior Chain Strength", "Lower Body", "Advanced", "55 min", ["Deadlift 5x3", "Romanian Deadlift 4x6", "Hip Thrust 4x8", "Nordic Curl 3x5", "Back Extension 3x12"], "Heavy hinge day for power."),
+    workoutTemplate("db-push-pull", "Push Pull Upper", "Upper Body", "Beginner", "42 min", ["Dumbbell Bench Press 4x10", "One-Arm Dumbbell Row 4x10 each", "Strict Press 3x8", "Chin-Ups 3xMax", "Face Pulls 3x15"], "Balanced upper-body session."),
+    workoutTemplate("db-total-athlete", "Total Athlete Circuit", "Full Body", "Intermediate", "38 min", ["Kettlebell Swing 4x12", "Push-Ups 4x15", "Goblet Squat 4x12", "Battle Ropes 4x30 sec", "Plank 4x45 sec"], "Move well, rest 60-90 sec."),
+    workoutTemplate("db-conditioning-engine", "Engine Builder", "Conditioning", "Beginner", "30 min", ["Bike 5 min easy", "Bike 10x30 sec hard / 60 sec easy", "Row 5 min steady", "Jump Rope 5 min", "Breathing Reset 3 min"], "Low impact conditioning."),
+    workoutTemplate("db-basketball-strength-a", "Basketball Strength A", "Basketball Strength", "Intermediate", "50 min", ["Front Squat 4x5", "Bench Press 4x5", "Dumbbell Row 4x10", "Split Squat 3x8 each", "Pallof Press 3x12"], "A balanced in-season strength option."),
+    workoutTemplate("db-basketball-strength-b", "Basketball Strength B", "Basketball Strength", "Intermediate", "48 min", ["Trap Bar Deadlift 4x4", "Landmine Press 4x8", "Pull-Ups 4xMax", "Step-Ups 3x8 each", "Farmer Carry 3 rounds"], "Strength without too much soreness."),
+    workoutTemplate("db-power-clean-day", "Power Clean Technique", "Explosive Power", "Advanced", "45 min", ["Clean Pull 4x3", "Hang Clean 6x2", "Front Squat 3x3", "Box Jump 4x3", "Med Ball Slam 4x5"], "Stop sets before speed drops."),
+    workoutTemplate("db-first-step", "First Step Quickness", "Explosive Power", "Intermediate", "30 min", ["Wall Drill 3x10 each", "Falling Starts 6x10m", "Lateral Push-Off 4x5 each", "Resisted Sprint 6x10m", "Pogo Jumps 3x20"], "Short, sharp acceleration work."),
+    workoutTemplate("db-single-leg-strength", "Single-Leg Strength", "Lower Body", "Intermediate", "45 min", ["Bulgarian Split Squat 4x8 each", "Single-Leg RDL 4x8 each", "Lateral Lunge 3x10 each", "Step-Down 3x8 each", "Calf Raise 3x15 each"], "Build control and knee strength."),
+    workoutTemplate("db-shoulder-care", "Shoulder Care", "Recovery", "Beginner", "24 min", ["Band Pull-Aparts 3x20", "External Rotation 3x15 each", "Scap Push-Ups 3x12", "Wall Slides 3x10", "Child's Pose Breathing 2 min"], "Easy prep for upper-body days."),
+    workoutTemplate("db-mobility-reset", "Full Body Mobility Reset", "Mobility", "Beginner", "28 min", ["World's Greatest Stretch 2x5 each", "Thoracic Rotation 2x10 each", "Couch Stretch 2 min each", "Ankle Rocks 2x15 each", "Deep Squat Breathing 2 min"], "Use on off days or after practice."),
+    workoutTemplate("db-abs-finisher", "10-Min Core Finisher", "Core", "Beginner", "10 min", ["Hollow Hold 3x30 sec", "Bicycle Crunches 3x20", "Leg Raises 3x12", "Plank Shoulder Taps 3x20", "Dead Bug 2x10 each"], "Quick finisher after lifting."),
+    workoutTemplate("db-full-body-power", "Full Body Power", "Full Body", "Advanced", "50 min", ["Power Snatch 5x2", "Push Press 5x3", "Jump Squat 4x5", "Pull-Ups 4xMax", "Sled Push 6 rounds"], "Explosive full-body session."),
+    workoutTemplate("db-tempo-lower", "Tempo Lower Body", "Lower Body", "Intermediate", "46 min", ["Tempo Back Squat 4x6", "Romanian Deadlift 3x8", "Walking Lunges 3x12 each", "Leg Curl 3x12", "Tibialis Raises 3x20"], "Slow eccentrics, strong positions."),
+    workoutTemplate("db-game-day-primer", "Game Day Primer", "Recovery", "Beginner", "18 min", ["Easy Bike 4 min", "Dynamic Warm-Up 5 min", "Pogo Jumps 3x10", "Approach Jumps 3x2", "Band Pull-Aparts 2x15"], "Feel springy, not tired.")
   ];
 
   const libraryTabs = ["All", "Favorites", "Recent", "Strength", "Cardio", "Benchmarks"];
@@ -121,18 +160,12 @@
     }))
   ];
 
-  const defaultAthleteId = makeId();
   const defaultState = {
-    version: 2,
-    activeAthleteId: defaultAthleteId,
+    version: 5,
     settings: {
       darkMode: false,
-      units: "lb",
-      coachMode: false
+      units: "lb"
     },
-    athletes: [
-      { id: defaultAthleteId, name: "My Profile" }
-    ],
     movements: [
       {
         id: makeId(),
@@ -159,6 +192,9 @@
         favorite: false
       }
     ],
+    workouts: [],
+    workoutFavorites: [],
+    workoutHistory: [],
     logs: []
   };
 
@@ -169,6 +205,15 @@
   let activeCategoryFilter = "All";
   let activeLibraryTab = "All";
   let activePickerTab = "All";
+  let activeWorkoutCategory = "All";
+  let activeWorkoutDifficulty = "All";
+  let activeDatabaseWorkoutId = null;
+  let workoutTimer = {
+    kind: null,
+    startedAt: null,
+    duration: 0,
+    intervalId: null
+  };
   let swipeStart = null;
 
   const els = {};
@@ -188,15 +233,17 @@
   function cacheElements() {
     [
       "totalSessions", "thisWeekSessions", "trackedMovements", "quickAddMovement",
-      "activeAthleteAvatar", "athleteSelect", "coachModeToggle", "coachPanel",
-      "coachGrid", "quickExerciseButtons", "logMovementSelect", "logForm",
+      "quickExerciseButtons", "logMovementSelect", "logForm",
       "logDate", "logFields", "autofillSuggestions", "logEffort", "effortValue",
       "logNotes", "duplicateLastWorkout", "recentResults", "progressMovementSelect",
       "progressBest", "progressPreviousBest", "progressTrend", "progressChart",
       "chartTooltip", "movementHistory", "movementForm", "movementId",
       "movementName", "movementCategory", "movementPrimaryMetric", "movementFavorite",
-      "cancelMovementEdit", "benchmarkButtons", "movementList", "athleteForm",
-      "athleteName", "profileList", "darkModeToggle", "unitSelect", "exportData",
+      "cancelMovementEdit", "benchmarkButtons", "workoutBuilderDetails", "workoutForm", "workoutId", "workoutName",
+      "workoutFormat", "workoutRounds", "workoutMovements", "cancelWorkoutEdit", "workoutList",
+      "databaseWorkoutDetail", "workoutBrowse", "workoutSearch", "workoutDifficultyFilters",
+      "workoutCategoryFilters", "favoriteWorkoutChips", "recentWorkoutChips", "databaseWorkoutList",
+      "movementList", "darkModeToggle", "unitSelect", "exportData",
       "importData", "clearData", "stickySaveResult", "toast", "openMovementPicker",
       "movementPicker", "closeMovementPicker", "pickerSearch", "pickerFavorites",
       "pickerRecent", "pickerMostUsed", "pickerResults", "movementSearch", "categoryFilters",
@@ -217,19 +264,6 @@
       els.movementName.focus();
     });
 
-    els.athleteSelect.addEventListener("change", () => {
-      state.activeAthleteId = els.athleteSelect.value;
-      saveState();
-      renderAll();
-      showToast(`Switched to ${activeAthlete().name}`);
-    });
-
-    els.coachModeToggle.addEventListener("change", () => {
-      state.settings.coachMode = els.coachModeToggle.checked;
-      saveState();
-      renderAll();
-    });
-
     els.logMovementSelect.addEventListener("change", () => {
       renderLogFields(true);
       renderAutofillSuggestions();
@@ -244,6 +278,7 @@
     });
 
     els.progressMovementSelect.addEventListener("change", renderProgress);
+    els.workoutSearch.addEventListener("input", renderWorkoutDatabase);
 
     els.logEffort.addEventListener("input", () => {
       els.effortValue.textContent = els.logEffort.value;
@@ -267,10 +302,12 @@
 
     els.cancelMovementEdit.addEventListener("click", resetMovementForm);
 
-    els.athleteForm.addEventListener("submit", (event) => {
+    els.workoutForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      addAthlete();
+      saveWorkout();
     });
+
+    els.cancelWorkoutEdit.addEventListener("click", resetWorkoutForm);
 
     els.darkModeToggle.addEventListener("change", () => {
       state.settings.darkMode = els.darkModeToggle.checked;
@@ -297,16 +334,15 @@
   }
 
   function renderAll() {
-    ensureValidSelections();
-    renderAthletes();
     renderSummary();
-    renderCoachPanel();
     renderMovementSelects();
     renderQuickButtons();
     renderLogFields(false);
     renderAutofillSuggestions();
     renderRecentResults();
+    renderWorkoutDatabase();
     renderBenchmarkButtons();
+    renderWorkoutList();
     renderLibraryTabs();
     renderCategoryFilters();
     renderMostUsedSections();
@@ -327,37 +363,15 @@
     });
     els.stickySaveResult.hidden = view !== "track";
     if (view === "progress") renderProgress();
-  }
-
-  function renderAthletes() {
-    els.athleteSelect.innerHTML = state.athletes
-      .map((athlete) => `<option value="${athlete.id}">${escapeHtml(athlete.name)}</option>`)
-      .join("");
-    els.athleteSelect.value = state.activeAthleteId;
-    els.activeAthleteAvatar.textContent = initials(activeAthlete().name);
+    if (view === "workouts") renderWorkoutDatabase();
   }
 
   function renderSummary() {
     const logs = activeLogs();
-    els.totalSessions.textContent = logs.length;
-    els.thisWeekSessions.textContent = logs.filter((log) => isThisWeek(log.date)).length;
+    const completedWorkouts = state.workoutHistory || [];
+    els.totalSessions.textContent = logs.length + completedWorkouts.length;
+    els.thisWeekSessions.textContent = logs.filter((log) => isThisWeek(log.date)).length + completedWorkouts.filter((entry) => isThisWeek(entry.date)).length;
     els.trackedMovements.textContent = state.movements.length;
-  }
-
-  function renderCoachPanel() {
-    els.coachPanel.hidden = !state.settings.coachMode;
-    if (!state.settings.coachMode) return;
-
-    els.coachGrid.innerHTML = state.athletes.map((athlete) => {
-      const logs = logsForAthlete(athlete.id);
-      return `
-        <article class="coach-card">
-          <strong>${escapeHtml(initials(athlete.name))}</strong>
-          <p>${escapeHtml(athlete.name)}</p>
-          <p>${logs.length} sessions</p>
-        </article>
-      `;
-    }).join("");
   }
 
   function renderMovementSelects() {
@@ -423,7 +437,12 @@
     els.logForm.querySelector(".primary-button").disabled = false;
     const recent = latestLogForMovement(movement.id);
 
+    if (usesSetLogger(movement)) {
+      els.logFields.appendChild(renderSetLogger(recent));
+    }
+
     movement.metrics.forEach((metric) => {
+      if (usesSetLogger(movement) && ["sets", "reps", "weight"].includes(metric)) return;
       const label = document.createElement("label");
       label.className = "field";
       label.innerHTML = `
@@ -439,12 +458,59 @@
       els.logFields.appendChild(label);
     });
 
+    const addSetButton = els.logFields.querySelector("[data-action='add-set']");
+    if (addSetButton) {
+      addSetButton.addEventListener("click", () => addSetRow());
+    }
+
     if (shouldFocus) {
       requestAnimationFrame(() => {
         const firstInput = els.logFields.querySelector("input");
         if (firstInput) firstInput.focus();
       });
     }
+  }
+
+  function renderSetLogger(recent) {
+    const wrapper = document.createElement("section");
+    wrapper.className = "set-logger";
+    wrapper.innerHTML = `
+      <div class="set-logger-heading">
+        <span>Sets</span>
+        <button class="small-button" type="button" data-action="add-set">Add Set</button>
+      </div>
+      <div class="set-row set-row-labels" aria-hidden="true">
+        <span>Set</span>
+        <span>Reps</span>
+        <span>Weight</span>
+      </div>
+      <div class="set-rows" id="setRows"></div>
+    `;
+
+    const recentSets = Array.isArray(recent?.values?.setDetails) ? recent.values.setDetails : [];
+    const starterSets = recentSets.length ? recentSets : [{ reps: "", weight: "" }, { reps: "", weight: "" }, { reps: "", weight: "" }];
+    starterSets.forEach((set) => appendSetRow(wrapper.querySelector("#setRows"), set));
+    return wrapper;
+  }
+
+  function addSetRow() {
+    const rows = document.getElementById("setRows");
+    if (!rows) return;
+    appendSetRow(rows, { reps: "", weight: "" });
+    const lastInput = rows.querySelector(".set-row:last-child input");
+    if (lastInput) lastInput.focus();
+  }
+
+  function appendSetRow(container, set) {
+    const rowNumber = container.querySelectorAll(".set-row").length + 1;
+    const row = document.createElement("div");
+    row.className = "set-row";
+    row.innerHTML = `
+      <span>${rowNumber}</span>
+      <input type="text" inputmode="decimal" data-set-reps placeholder="8" value="${escapeHtml(set.reps || "")}" autocomplete="off">
+      <input type="text" inputmode="decimal" data-set-weight placeholder="135" value="${escapeHtml(set.weight || "")}" autocomplete="off">
+    `;
+    container.appendChild(row);
   }
 
   function renderAutofillSuggestions() {
@@ -462,7 +528,13 @@
   }
 
   function fillFromLog(log) {
+    if (Array.isArray(log.values?.setDetails) && document.getElementById("setRows")) {
+      const rows = document.getElementById("setRows");
+      rows.innerHTML = "";
+      log.values.setDetails.forEach((set) => appendSetRow(rows, set));
+    }
     Object.entries(log.values || {}).forEach(([metric, value]) => {
+      if (metric === "setDetails") return;
       const input = document.getElementById(`log-${metric}`);
       if (input) input.value = value;
     });
@@ -487,6 +559,263 @@
 
     drawChart(movement, logs);
     renderLogList(els.movementHistory, logs.slice().reverse(), true);
+  }
+
+  function renderWorkoutDatabase() {
+    renderWorkoutFilters();
+    renderWorkoutShortcutChips();
+    renderDatabaseWorkoutList();
+    renderDatabaseWorkoutDetail();
+  }
+
+  function renderWorkoutFilters() {
+    els.workoutDifficultyFilters.innerHTML = workoutDifficulties.map((difficulty) => `
+      <button class="library-tab ${difficulty === activeWorkoutDifficulty ? "is-active" : ""}" type="button" data-workout-difficulty="${difficulty}">${difficulty}</button>
+    `).join("");
+    els.workoutCategoryFilters.innerHTML = workoutCategories.map((category) => `
+      <button class="chip ${category === activeWorkoutCategory ? "is-active" : ""}" type="button" data-workout-category="${category}">${category}</button>
+    `).join("");
+
+    els.workoutDifficultyFilters.querySelectorAll("[data-workout-difficulty]").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeWorkoutDifficulty = button.dataset.workoutDifficulty;
+        renderWorkoutDatabase();
+      });
+    });
+
+    els.workoutCategoryFilters.querySelectorAll("[data-workout-category]").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeWorkoutCategory = button.dataset.workoutCategory;
+        renderWorkoutDatabase();
+      });
+    });
+  }
+
+  function renderWorkoutShortcutChips() {
+    const favorites = state.workoutFavorites.map(getDatabaseWorkout).filter(Boolean).slice(0, 10);
+    const recentIds = [...new Set(state.workoutHistory.slice().sort((a, b) => b.completedAt - a.completedAt).map((entry) => entry.workoutId))];
+    const recent = recentIds.map(getDatabaseWorkout).filter(Boolean).slice(0, 10);
+
+    els.favoriteWorkoutChips.innerHTML = favorites.length
+      ? favorites.map((workout) => workoutChip(workout)).join("")
+      : '<p class="empty-state">Favorite workouts appear here.</p>';
+    els.recentWorkoutChips.innerHTML = recent.length
+      ? recent.map((workout) => workoutChip(workout)).join("")
+      : '<p class="empty-state">Completed workouts appear here.</p>';
+
+    [els.favoriteWorkoutChips, els.recentWorkoutChips].forEach((container) => {
+      container.querySelectorAll("[data-database-workout]").forEach((button) => {
+        button.addEventListener("click", () => openDatabaseWorkout(button.dataset.databaseWorkout));
+      });
+    });
+  }
+
+  function renderDatabaseWorkoutList() {
+    const workouts = getFilteredDatabaseWorkouts();
+    if (!workouts.length) {
+      els.databaseWorkoutList.innerHTML = '<p class="empty-state">No workouts match those filters.</p>';
+      return;
+    }
+
+    els.databaseWorkoutList.innerHTML = workouts.map((workout) => {
+      const completed = state.workoutHistory.filter((entry) => entry.workoutId === workout.id).length;
+      const isFavorite = state.workoutFavorites.includes(workout.id);
+      return `
+        <article class="database-workout-card">
+          <button type="button" class="database-workout-main" data-open-workout="${workout.id}">
+            <span class="category-badge ${difficultyClass(workout.difficulty)}">${escapeHtml(workout.difficulty)}</span>
+            <strong>${escapeHtml(workout.name)}</strong>
+            <span>${escapeHtml(workout.category)} &middot; ${escapeHtml(workout.duration)} &middot; ${completed} completed</span>
+          </button>
+          <button class="favorite-button ${isFavorite ? "is-on" : ""}" type="button" data-favorite-workout="${workout.id}" aria-label="Favorite workout">${isFavorite ? "Pin" : "+"}</button>
+        </article>
+      `;
+    }).join("");
+
+    els.databaseWorkoutList.querySelectorAll("[data-open-workout]").forEach((button) => {
+      button.addEventListener("click", () => openDatabaseWorkout(button.dataset.openWorkout));
+    });
+    els.databaseWorkoutList.querySelectorAll("[data-favorite-workout]").forEach((button) => {
+      button.addEventListener("click", () => toggleDatabaseWorkoutFavorite(button.dataset.favoriteWorkout));
+    });
+  }
+
+  function renderDatabaseWorkoutDetail() {
+    const workout = getDatabaseWorkout(activeDatabaseWorkoutId);
+    if (!workout) {
+      els.databaseWorkoutDetail.hidden = true;
+      els.workoutBrowse.hidden = false;
+      stopWorkoutTimer();
+      return;
+    }
+
+    els.workoutBrowse.hidden = true;
+    els.databaseWorkoutDetail.hidden = false;
+    const completed = state.workoutHistory.filter((entry) => entry.workoutId === workout.id).length;
+    const isFavorite = state.workoutFavorites.includes(workout.id);
+    els.databaseWorkoutDetail.innerHTML = `
+      <button class="small-button detail-back-button" type="button" data-action="back-workouts">Back</button>
+      <div class="section-heading compact">
+        <div>
+          <h2>${escapeHtml(workout.name)}</h2>
+          <p>${escapeHtml(workout.category)} &middot; ${escapeHtml(workout.difficulty)} &middot; ${escapeHtml(workout.duration)} &middot; ${completed} completed</p>
+        </div>
+      </div>
+      ${workout.notes ? `<p class="workout-note">${escapeHtml(workout.notes)}</p>` : ""}
+      <div class="workout-detail-actions">
+        <button class="primary-button" type="button" data-action="start-workout">Start Workout</button>
+        <button class="secondary-button" type="button" data-action="rest-timer">Rest 60s</button>
+        <button class="secondary-button" type="button" data-action="favorite-workout">${isFavorite ? "Unfavorite" : "Favorite"}</button>
+      </div>
+      <div class="workout-timer" id="workoutTimerDisplay">Ready</div>
+      <div class="workout-exercise-list">
+        ${workout.exercises.map((exercise, index) => `
+          <label class="workout-exercise-row">
+            <input type="checkbox" data-workout-check="${index}">
+            <span>
+              <strong>${escapeHtml(exercise.name)}</strong>
+              <small>${escapeHtml(exercise.prescription)}</small>
+            </span>
+          </label>
+        `).join("")}
+      </div>
+      <label class="field">
+        <span>Result or notes</span>
+        <textarea id="databaseWorkoutResult" rows="3" placeholder="Finished all sets, weights used, time, how it felt..."></textarea>
+      </label>
+      <button class="primary-button" type="button" data-action="complete-workout">Complete Workout</button>
+    `;
+
+    els.databaseWorkoutDetail.querySelector("[data-action='back-workouts']").addEventListener("click", closeDatabaseWorkout);
+    els.databaseWorkoutDetail.querySelector("[data-action='start-workout']").addEventListener("click", startWorkoutTimer);
+    els.databaseWorkoutDetail.querySelector("[data-action='rest-timer']").addEventListener("click", () => startRestTimer(60));
+    els.databaseWorkoutDetail.querySelector("[data-action='favorite-workout']").addEventListener("click", () => toggleDatabaseWorkoutFavorite(workout.id));
+    els.databaseWorkoutDetail.querySelector("[data-action='complete-workout']").addEventListener("click", () => completeDatabaseWorkout(workout.id));
+    updateWorkoutTimerDisplay();
+  }
+
+  function openDatabaseWorkout(id) {
+    activeDatabaseWorkoutId = id;
+    stopWorkoutTimer();
+    renderWorkoutDatabase();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeDatabaseWorkout() {
+    activeDatabaseWorkoutId = null;
+    stopWorkoutTimer();
+    renderWorkoutDatabase();
+  }
+
+  function getFilteredDatabaseWorkouts() {
+    const query = normalizeName(els.workoutSearch.value);
+    return workoutDatabase
+      .filter((workout) => {
+        if (activeWorkoutCategory === "Favorites") return state.workoutFavorites.includes(workout.id);
+        if (activeWorkoutCategory === "Recent") return state.workoutHistory.some((entry) => entry.workoutId === workout.id);
+        if (activeWorkoutCategory !== "All" && workout.category !== activeWorkoutCategory) return false;
+        return true;
+      })
+      .filter((workout) => activeWorkoutDifficulty === "All" || workout.difficulty === activeWorkoutDifficulty)
+      .filter((workout) => !query || searchableDatabaseWorkoutText(workout).includes(query))
+      .sort((a, b) => {
+        const aFav = state.workoutFavorites.includes(a.id);
+        const bFav = state.workoutFavorites.includes(b.id);
+        if (aFav !== bFav) return aFav ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+  }
+
+  function toggleDatabaseWorkoutFavorite(id) {
+    if (state.workoutFavorites.includes(id)) {
+      state.workoutFavorites = state.workoutFavorites.filter((item) => item !== id);
+    } else {
+      state.workoutFavorites.push(id);
+    }
+    saveState();
+    renderWorkoutDatabase();
+  }
+
+  function completeDatabaseWorkout(id) {
+    const workout = getDatabaseWorkout(id);
+    if (!workout) return;
+
+    const checked = Array.from(els.databaseWorkoutDetail.querySelectorAll("[data-workout-check]"))
+      .filter((input) => input.checked)
+      .map((input) => Number(input.dataset.workoutCheck));
+    const result = document.getElementById("databaseWorkoutResult")?.value.trim() || "";
+
+    state.workoutHistory.push({
+      id: makeId(),
+      workoutId: workout.id,
+      completedAt: Date.now(),
+      date: localDate(),
+      checked,
+      result,
+      elapsedSeconds: workoutTimer.kind === "workout" && workoutTimer.startedAt
+        ? Math.max(0, Math.floor((Date.now() - workoutTimer.startedAt) / 1000))
+        : null
+    });
+
+    saveState();
+    stopWorkoutTimer();
+    activeDatabaseWorkoutId = null;
+    renderAll();
+    setView("workouts");
+    showToast("Workout complete!");
+  }
+
+  function startWorkoutTimer() {
+    stopWorkoutTimer();
+    workoutTimer = {
+      kind: "workout",
+      startedAt: Date.now(),
+      duration: 0,
+      intervalId: window.setInterval(updateWorkoutTimerDisplay, 1000)
+    };
+    updateWorkoutTimerDisplay();
+  }
+
+  function startRestTimer(seconds) {
+    stopWorkoutTimer();
+    workoutTimer = {
+      kind: "rest",
+      startedAt: Date.now(),
+      duration: seconds,
+      intervalId: window.setInterval(updateWorkoutTimerDisplay, 1000)
+    };
+    updateWorkoutTimerDisplay();
+  }
+
+  function stopWorkoutTimer() {
+    if (workoutTimer.intervalId) window.clearInterval(workoutTimer.intervalId);
+    workoutTimer = { kind: null, startedAt: null, duration: 0, intervalId: null };
+  }
+
+  function updateWorkoutTimerDisplay() {
+    const display = document.getElementById("workoutTimerDisplay");
+    if (!display) return;
+    if (!workoutTimer.kind || !workoutTimer.startedAt) {
+      display.textContent = "Ready";
+      return;
+    }
+
+    const elapsed = Math.max(0, Math.floor((Date.now() - workoutTimer.startedAt) / 1000));
+    if (workoutTimer.kind === "rest") {
+      const remaining = Math.max(0, workoutTimer.duration - elapsed);
+      display.textContent = remaining ? `Rest ${formatTimer(remaining)}` : "Rest done";
+      if (!remaining) {
+        window.clearInterval(workoutTimer.intervalId);
+        workoutTimer.intervalId = null;
+      }
+      return;
+    }
+
+    display.textContent = `Workout ${formatTimer(elapsed)}`;
+  }
+
+  function workoutChip(workout) {
+    return `<button class="chip" type="button" data-database-workout="${workout.id}">${escapeHtml(workout.name)}</button>`;
   }
 
   function renderBenchmarkButtons() {
@@ -613,6 +942,39 @@
     });
   }
 
+  function renderWorkoutList() {
+    els.workoutList.innerHTML = "";
+
+    if (!state.workouts.length) {
+      els.workoutList.innerHTML = '<p class="empty-state">Save a workout like 4 rounds for time, then log it whenever you repeat it.</p>';
+      return;
+    }
+
+    state.workouts.forEach((workout) => {
+      const logs = logsForWorkout(workout.id);
+      const best = getBestWorkoutResult(workout);
+      const card = document.createElement("article");
+      card.className = "workout-card";
+      card.innerHTML = `
+        <div>
+          <h3>${escapeHtml(workout.name)}</h3>
+          <p>${escapeHtml(workoutSummary(workout))}</p>
+          <ol>${workout.movements.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ol>
+          <p>${logs.length} logged${Number.isFinite(best) ? ` &middot; Best ${escapeHtml(formatWorkoutResult(workout, best))}` : ""}</p>
+        </div>
+        <div class="movement-actions">
+          <button type="button" data-action="log">Log</button>
+          <button type="button" data-action="edit">Edit</button>
+          <button type="button" data-action="delete">Delete</button>
+        </div>
+      `;
+      card.querySelector('[data-action="log"]').addEventListener("click", () => logWorkout(workout.id));
+      card.querySelector('[data-action="edit"]').addEventListener("click", () => editWorkout(workout.id));
+      card.querySelector('[data-action="delete"]').addEventListener("click", () => deleteWorkout(workout.id));
+      els.workoutList.appendChild(card);
+    });
+  }
+
   function openMovementPicker() {
     els.pickerSearch.value = "";
     renderMovementPicker();
@@ -711,24 +1073,8 @@
   }
 
   function renderSettings() {
-    els.coachModeToggle.checked = state.settings.coachMode;
     els.darkModeToggle.checked = state.settings.darkMode;
     els.unitSelect.value = state.settings.units;
-    els.profileList.innerHTML = state.athletes.map((athlete) => `
-      <article class="profile-card">
-        <div class="avatar">${escapeHtml(initials(athlete.name))}</div>
-        <strong>${escapeHtml(athlete.name)}</strong>
-        <button class="secondary-button" type="button" data-athlete="${athlete.id}">Use</button>
-      </article>
-    `).join("");
-
-    els.profileList.querySelectorAll("[data-athlete]").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.activeAthleteId = button.dataset.athlete;
-        saveState();
-        renderAll();
-      });
-    });
   }
 
   function saveLog() {
@@ -745,7 +1091,6 @@
 
     const log = {
       id: makeId(),
-      athleteId: state.activeAthleteId,
       movementId: movement.id,
       date: els.logDate.value || localDate(),
       values,
@@ -761,12 +1106,27 @@
     saveState();
     clearLogForm(movement);
     renderAll();
-    showToast(isPr ? "Saved. New PR!" : "Workout result saved");
+    showToast(isPr ? "Saved! New PR." : "Saved!");
   }
 
   function collectLogValues(movement) {
     const values = {};
+    if (usesSetLogger(movement)) {
+      const setDetails = Array.from(document.querySelectorAll("#setRows .set-row"))
+        .map((row) => ({
+          reps: row.querySelector("[data-set-reps]")?.value.trim() || "",
+          weight: row.querySelector("[data-set-weight]")?.value.trim() || ""
+        }))
+        .filter((set) => set.reps || set.weight);
+
+      values.setDetails = setDetails;
+      values.sets = setDetails.length ? String(setDetails.length) : "";
+      values.reps = setDetails.map((set) => set.reps).filter(Boolean).join(", ");
+      values.weight = setDetails.map((set) => set.weight).filter(Boolean).join(", ");
+    }
+
     movement.metrics.forEach((metric) => {
+      if (usesSetLogger(movement) && ["sets", "reps", "weight"].includes(metric)) return;
       const input = document.getElementById(`log-${metric}`);
       values[metric] = input ? input.value.trim() : "";
     });
@@ -778,6 +1138,14 @@
       const input = document.getElementById(`log-${metric}`);
       if (input) input.value = "";
     });
+    if (usesSetLogger(movement)) {
+      const rows = document.getElementById("setRows");
+      if (rows) {
+        rows.innerHTML = "";
+        [{ reps: "", weight: "" }, { reps: "", weight: "" }, { reps: "", weight: "" }]
+          .forEach((set) => appendSetRow(rows, set));
+      }
+    }
     els.logNotes.value = "";
   }
 
@@ -814,6 +1182,39 @@
     resetMovementForm();
     renderAll();
     showToast("Exercise saved");
+  }
+
+  function saveWorkout() {
+    const movements = els.workoutMovements.value
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (!els.workoutName.value.trim() || !movements.length) {
+      alert("Add a workout name and at least one movement.");
+      return;
+    }
+
+    const workout = {
+      id: els.workoutId.value || makeId(),
+      name: els.workoutName.value.trim(),
+      format: els.workoutFormat.value,
+      rounds: els.workoutRounds.value.trim(),
+      movements,
+      createdAt: Date.now()
+    };
+
+    const existingIndex = state.workouts.findIndex((item) => item.id === workout.id);
+    if (existingIndex >= 0) {
+      state.workouts[existingIndex] = { ...state.workouts[existingIndex], ...workout };
+    } else {
+      state.workouts.push(workout);
+    }
+
+    saveState();
+    resetWorkoutForm();
+    renderAll();
+    showToast("Workout saved");
   }
 
   function toggleFavorite(id) {
@@ -869,6 +1270,76 @@
     renderAll();
   }
 
+  function editWorkout(id) {
+    const workout = getWorkout(id);
+    if (!workout) return;
+
+    els.workoutId.value = workout.id;
+    els.workoutName.value = workout.name;
+    els.workoutFormat.value = workout.format || "time";
+    els.workoutRounds.value = workout.rounds || "";
+    els.workoutMovements.value = (workout.movements || []).join("\n");
+    els.workoutBuilderDetails.open = true;
+    els.workoutName.focus();
+  }
+
+  function resetWorkoutForm() {
+    els.workoutId.value = "";
+    els.workoutForm.reset();
+    els.workoutFormat.value = "time";
+    els.workoutBuilderDetails.open = false;
+  }
+
+  function deleteWorkout(id) {
+    const workout = getWorkout(id);
+    if (!workout) return;
+
+    const logCount = state.logs.filter((log) => log.workoutId === id).length;
+    const message = logCount
+      ? `Delete ${workout.name} and its ${logCount} saved result(s)?`
+      : `Delete ${workout.name}?`;
+
+    if (!confirm(message)) return;
+
+    state.workouts = state.workouts.filter((item) => item.id !== id);
+    state.logs = state.logs.filter((log) => log.workoutId !== id);
+    saveState();
+    renderAll();
+  }
+
+  function logWorkout(id) {
+    const workout = getWorkout(id);
+    if (!workout) return;
+
+    const label = workout.format === "time"
+      ? "Enter your finish time, like 12:34"
+      : "Enter your result, like 7 rounds + 12 reps";
+    const result = prompt(`${workout.name}\n${label}`);
+    if (!result || !result.trim()) return;
+
+    const notes = prompt("Any notes? Leave blank if not.") || "";
+    const currentValue = workoutResultValue(workout, result);
+    const previousBest = getBestWorkoutResult(workout);
+    const isPr = isNewBestWorkout(workout, currentValue, previousBest);
+
+    state.logs.push({
+      id: makeId(),
+      workoutId: workout.id,
+      date: localDate(),
+      values: { result: result.trim() },
+      effort: 7,
+      notes: notes.trim(),
+      createdAt: Date.now(),
+      resultValue: Number.isFinite(currentValue) ? currentValue : null,
+      previousBest: Number.isFinite(previousBest) ? previousBest : null,
+      pr: isPr
+    });
+
+    saveState();
+    renderAll();
+    showToast(isPr ? "Saved! New PR." : "Saved!");
+  }
+
   function addOrSelectBenchmark(name) {
     const existing = state.movements.find((movement) => movement.name.toLowerCase() === name.toLowerCase());
     if (existing) {
@@ -908,42 +1379,32 @@
     fillFromLog(previous);
   }
 
-  function addAthlete() {
-    const name = els.athleteName.value.trim();
-    if (!name) return;
-    const athlete = { id: makeId(), name };
-    state.athletes.push(athlete);
-    state.activeAthleteId = athlete.id;
-    els.athleteName.value = "";
-    saveState();
-    renderAll();
-    showToast(`${name} added`);
-  }
-
   function renderLogList(container, logs, allowDelete) {
     container.innerHTML = "";
 
     if (!logs.length) {
-      container.innerHTML = '<p class="empty-state">No results logged yet.</p>';
+      container.innerHTML = '<p class="empty-state">Start by choosing an exercise and logging your first result.</p>';
       return;
     }
 
     logs.forEach((log) => {
       const movement = getMovement(log.movementId);
-      const currentValue = movement ? metricValue(movement, log) : NaN;
+      const workout = getWorkout(log.workoutId);
+      const currentValue = movement ? metricValue(movement, log) : workout ? workoutResultValue(workout, log.values?.result) : NaN;
       const previousBest = Number.isFinite(log.previousBest)
         ? log.previousBest
-        : getBestBeforeLog(movement, log);
-      const isPr = movement && isNewBest(movement, currentValue, previousBest);
-      const athlete = getAthlete(log.athleteId);
+        : movement ? getBestBeforeLog(movement, log) : getBestWorkoutBeforeLog(workout, log);
+      const isPr = movement ? isNewBest(movement, currentValue, previousBest) : workout && isNewBestWorkout(workout, currentValue, previousBest);
+      const title = movement ? movement.name : workout ? workout.name : "Deleted workout";
       const card = document.createElement("article");
       card.className = "result-card";
       card.innerHTML = `
         <div>
-          <h3>${escapeHtml(movement ? movement.name : "Deleted exercise")} ${isPr ? '<span class="pr-badge">PR</span>' : ""}</h3>
+          <h3>${escapeHtml(title)} ${isPr ? '<span class="pr-badge">PR</span>' : ""}</h3>
           <div class="result-values">${formatValuePills(log)}</div>
-          <p class="result-meta">${formatDate(log.date)} &middot; ${escapeHtml(athlete.name)} &middot; Effort ${log.effort}/10</p>
+          <p class="result-meta">${formatDate(log.date)} &middot; Effort ${log.effort}/10</p>
           ${movement && Number.isFinite(currentValue) ? `<p class="result-meta">Current ${formatMetricValue(movement, currentValue)} &middot; Previous best ${formatMetricValue(movement, previousBest)}</p>` : ""}
+          ${workout && Number.isFinite(currentValue) ? `<p class="result-meta">Current ${escapeHtml(formatWorkoutResult(workout, currentValue))} &middot; Previous best ${escapeHtml(formatWorkoutResult(workout, previousBest))}</p>` : ""}
           ${log.notes ? `<p class="result-meta">${escapeHtml(log.notes)}</p>` : ""}
         </div>
       `;
@@ -1000,7 +1461,7 @@
   }
 
   function clearAllData() {
-    if (!confirm("Clear every athlete, exercise, and workout result?")) return;
+    if (!confirm("Clear every exercise, custom workout, and workout result?")) return;
     state = normalizeState(null);
     saveState();
     applySettings();
@@ -1161,16 +1622,32 @@
 
   function metricValue(movement, log) {
     const values = log.values || {};
+    const setValues = bestSetValues(values);
     const weight = parseNumber(values.weight);
     const reps = parseNumber(values.reps);
 
     if (movement.primaryMetric === "estimatedMax") {
+      if (setValues) return Math.round(setValues.weight * (1 + setValues.reps / 30));
       if (!Number.isFinite(weight) || !Number.isFinite(reps)) return NaN;
       return Math.round(weight * (1 + reps / 30));
     }
 
+    if (movement.primaryMetric === "weight" && setValues) return setValues.weight;
+    if (movement.primaryMetric === "reps" && setValues) return setValues.reps;
     if (movement.primaryMetric === "time") return parseTime(values.time);
     return parseNumber(values[movement.primaryMetric]);
+  }
+
+  function bestSetValues(values) {
+    if (!Array.isArray(values?.setDetails)) return null;
+    return values.setDetails.reduce((best, set) => {
+      const reps = parseNumber(set.reps);
+      const weight = parseNumber(set.weight);
+      if (!Number.isFinite(reps) || !Number.isFinite(weight)) return best;
+      const estimatedMax = weight * (1 + reps / 30);
+      if (!best || estimatedMax > best.estimatedMax) return { reps, weight, estimatedMax };
+      return best;
+    }, null);
   }
 
   function isNewBest(movement, currentValue, previousBest) {
@@ -1191,6 +1668,39 @@
     return getBestNumeric(movement, prior);
   }
 
+  function workoutResultValue(workout, result) {
+    if (!workout || !result) return NaN;
+    if (workout.format === "time") return parseTime(result);
+    return parseNumber(result);
+  }
+
+  function getBestWorkoutResult(workout) {
+    if (!workout) return NaN;
+    const values = logsForWorkout(workout.id)
+      .map((log) => workoutResultValue(workout, log.values?.result))
+      .filter(Number.isFinite);
+    if (!values.length) return NaN;
+    return workout.format === "time" ? Math.min(...values) : Math.max(...values);
+  }
+
+  function getBestWorkoutBeforeLog(workout, log) {
+    if (!workout) return NaN;
+    const values = logsForWorkout(workout.id)
+      .filter((item) => item.createdAt < log.createdAt)
+      .map((item) => workoutResultValue(workout, item.values?.result))
+      .filter(Number.isFinite);
+    if (!values.length) return NaN;
+    return workout.format === "time" ? Math.min(...values) : Math.max(...values);
+  }
+
+  function isNewBestWorkout(workout, currentValue, previousBest) {
+    if (!Number.isFinite(currentValue)) return false;
+    if (!Number.isFinite(previousBest)) return true;
+    return workout.format === "time"
+      ? currentValue < previousBest
+      : currentValue > previousBest;
+  }
+
   function getBestFromValues(movement, values) {
     if (!movement || !values.length) return NaN;
     return movement.primaryMetric === "time" ? Math.min(...values) : Math.max(...values);
@@ -1206,22 +1716,68 @@
     return String(round(value));
   }
 
+  function formatWorkoutResult(workout, value) {
+    if (!Number.isFinite(value)) return "--";
+    return workout.format === "time" ? formatSeconds(value) : String(round(value));
+  }
+
   function formatValuePills(log) {
+    if (Array.isArray(log.values?.setDetails) && log.values.setDetails.length) {
+      return log.values.setDetails.map((set, index) => (
+        `<span class="value-pill">Set ${index + 1}: ${escapeHtml(set.reps || "-")} reps @ ${escapeHtml(set.weight || "-")}</span>`
+      )).join("");
+    }
+
     return Object.entries(log.values || {})
       .filter((entry) => entry[1])
-      .map(([key, value]) => `<span class="value-pill">${metricLabels[key]} ${escapeHtml(value)}</span>`)
+      .map(([key, value]) => `<span class="value-pill">${metricLabels[key] || "Result"} ${escapeHtml(value)}</span>`)
       .join("") || '<span class="value-pill">No numbers entered</span>';
   }
 
   function formatPlainValues(log) {
+    if (Array.isArray(log.values?.setDetails) && log.values.setDetails.length) {
+      return `${log.values.setDetails.length} sets`;
+    }
+
     return Object.entries(log.values || {})
       .filter((entry) => entry[1])
-      .map(([key, value]) => `${metricLabels[key]} ${value}`)
+      .map(([key, value]) => `${metricLabels[key] || "Result"} ${value}`)
       .join(", ");
+  }
+
+  function workoutSummary(workout) {
+    const labels = {
+      time: "For time",
+      amrap: "AMRAP",
+      emom: "EMOM",
+      rounds: "Rounds/reps",
+      custom: "Custom"
+    };
+    return [workout.rounds, labels[workout.format] || "Workout"].filter(Boolean).join(" · ");
+  }
+
+  function searchableDatabaseWorkoutText(workout) {
+    return normalizeName(`${workout.name} ${workout.category} ${workout.difficulty} ${workout.duration} ${workout.notes || ""} ${workout.exercises.map((exercise) => `${exercise.name} ${exercise.prescription}`).join(" ")}`);
+  }
+
+  function difficultyClass(difficulty) {
+    if (difficulty === "Beginner") return "bodyweight";
+    if (difficulty === "Advanced") return "performance";
+    return "strength";
+  }
+
+  function formatTimer(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = String(seconds % 60).padStart(2, "0");
+    return `${mins}:${secs}`;
   }
 
   function formatMetricNames(movement) {
     return movement.metrics.map((metric) => metricLabels[metric]).join(", ");
+  }
+
+  function usesSetLogger(movement) {
+    return movement.metrics.includes("reps") && movement.metrics.includes("weight");
   }
 
   function sortMovements(movements) {
@@ -1467,23 +2023,20 @@
     return getMovement(els.progressMovementSelect.value) || state.movements[0];
   }
 
-  function activeAthlete() {
-    return getAthlete(state.activeAthleteId);
-  }
-
   function activeLogs() {
-    return logsForAthlete(state.activeAthleteId);
-  }
-
-  function logsForAthlete(athleteId) {
-    return state.logs
-      .filter((log) => log.athleteId === athleteId)
+    return state.logs.slice()
       .sort((a, b) => b.createdAt - a.createdAt);
   }
 
   function logsForMovement(movementId) {
     return activeLogs()
       .filter((log) => log.movementId === movementId)
+      .sort((a, b) => a.createdAt - b.createdAt);
+  }
+
+  function logsForWorkout(workoutId) {
+    return activeLogs()
+      .filter((log) => log.workoutId === workoutId)
       .sort((a, b) => a.createdAt - b.createdAt);
   }
 
@@ -1495,14 +2048,12 @@
     return state.movements.find((movement) => movement.id === id);
   }
 
-  function getAthlete(id) {
-    return state.athletes.find((athlete) => athlete.id === id) || state.athletes[0] || { id: "", name: "Athlete" };
+  function getWorkout(id) {
+    return state.workouts.find((workout) => workout.id === id);
   }
 
-  function ensureValidSelections() {
-    if (!state.athletes.some((athlete) => athlete.id === state.activeAthleteId)) {
-      state.activeAthleteId = state.athletes[0]?.id || makeId();
-    }
+  function getDatabaseWorkout(id) {
+    return workoutDatabase.find((workout) => workout.id === id);
   }
 
   function loadState() {
@@ -1513,11 +2064,13 @@
       localStorage.removeItem(STORAGE_KEY);
     }
 
-    try {
-      const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY));
-      if (legacy) return normalizeState(legacy);
-    } catch (error) {
-      localStorage.removeItem(LEGACY_KEY);
+    for (const key of LEGACY_KEYS) {
+      try {
+        const legacy = JSON.parse(localStorage.getItem(key));
+        if (legacy) return normalizeState(legacy);
+      } catch (error) {
+        localStorage.removeItem(key);
+      }
     }
 
     return normalizeState(null);
@@ -1528,20 +2081,12 @@
     base.movements = mergeExerciseLibrary(base.movements);
     if (!input || !Array.isArray(input.movements) || !Array.isArray(input.logs)) return base;
 
-    const athleteId = input.activeAthleteId || base.activeAthleteId;
-    const athletes = Array.isArray(input.athletes) && input.athletes.length
-      ? input.athletes
-      : [{ id: athleteId, name: "My Profile" }];
-
     return {
-      version: 2,
-      activeAthleteId: athleteId,
+      version: 5,
       settings: {
         darkMode: Boolean(input.settings?.darkMode),
-        units: input.settings?.units === "kg" ? "kg" : "lb",
-        coachMode: Boolean(input.settings?.coachMode)
+        units: input.settings?.units === "kg" ? "kg" : "lb"
       },
-      athletes,
       movements: mergeExerciseLibrary(input.movements.map((movement) => ({
         id: movement.id || makeId(),
         name: movement.name || "Exercise",
@@ -1553,12 +2098,34 @@
         aliases: Array.isArray(movement.aliases) ? movement.aliases : aliasesFor(movement.name),
         description: movement.description || ""
       }))),
+      workouts: Array.isArray(input.workouts) ? input.workouts.map((workout) => ({
+        id: workout.id || makeId(),
+        name: workout.name || "Custom Workout",
+        format: ["time", "amrap", "emom", "rounds", "custom"].includes(workout.format) ? workout.format : "time",
+        rounds: workout.rounds || "",
+        movements: Array.isArray(workout.movements)
+          ? workout.movements.filter(Boolean).map(String)
+          : String(workout.movements || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean),
+        createdAt: Number(workout.createdAt || Date.now())
+      })) : [],
+      workoutFavorites: Array.isArray(input.workoutFavorites)
+        ? input.workoutFavorites.filter((id) => Boolean(getDatabaseWorkout(id)))
+        : [],
+      workoutHistory: Array.isArray(input.workoutHistory) ? input.workoutHistory.map((entry, index) => ({
+        id: entry.id || makeId(),
+        workoutId: entry.workoutId,
+        completedAt: Number(entry.completedAt || Date.now() + index),
+        date: entry.date || localDate(),
+        checked: Array.isArray(entry.checked) ? entry.checked.map(Number).filter(Number.isFinite) : [],
+        result: entry.result || "",
+        elapsedSeconds: Number.isFinite(Number(entry.elapsedSeconds)) ? Number(entry.elapsedSeconds) : null
+      })).filter((entry) => Boolean(getDatabaseWorkout(entry.workoutId))) : [],
       logs: input.logs.map((log, index) => ({
         id: log.id || makeId(),
-        athleteId: log.athleteId || athleteId,
         movementId: log.movementId,
+        workoutId: log.workoutId,
         date: log.date || localDate(),
-        values: log.values || {},
+        values: normalizeLogValues(log.values),
         effort: Number(log.effort || 7),
         notes: log.notes || "",
         createdAt: Number(log.createdAt || Date.now() + index),
@@ -1567,6 +2134,19 @@
         pr: Boolean(log.pr)
       }))
     };
+  }
+
+  function normalizeLogValues(values) {
+    const normalized = values && typeof values === "object" ? { ...values } : {};
+    if (Array.isArray(normalized.setDetails)) {
+      normalized.setDetails = normalized.setDetails
+        .map((set) => ({
+          reps: String(set?.reps || "").trim(),
+          weight: String(set?.weight || "").trim()
+        }))
+        .filter((set) => set.reps || set.weight);
+    }
+    return normalized;
   }
 
   function saveState() {
@@ -1642,21 +2222,30 @@
     return `${minutes}:${remainder}`;
   }
 
-  function initials(name) {
-    return String(name || "A")
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0].toUpperCase())
-      .join("") || "A";
-  }
-
   function round(value) {
     return Math.round(value * 10) / 10;
   }
 
   function makeId() {
     return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  }
+
+  function workoutTemplate(id, name, category, difficulty, duration, lines, notes) {
+    return {
+      id,
+      name,
+      category,
+      difficulty,
+      duration,
+      exercises: lines.map((line) => {
+        const parts = line.split(",");
+        return {
+          name: parts.shift().trim(),
+          prescription: parts.join(",").trim() || "Complete with quality reps"
+        };
+      }),
+      notes
+    };
   }
 
   function debounce(fn, wait) {
