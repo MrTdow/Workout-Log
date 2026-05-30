@@ -1,6 +1,6 @@
 (function () {
-  const STORAGE_KEY = "workoutTracker.v5";
-  const LEGACY_KEYS = ["workoutTracker.v4", "workoutTracker.v3", "workoutTracker.v2", "workoutTracker.v1"];
+  const STORAGE_KEY = "workoutTracker.v6";
+  const LEGACY_KEYS = ["workoutTracker.v5", "workoutTracker.v4", "workoutTracker.v3", "workoutTracker.v2", "workoutTracker.v1"];
 
   const metricLabels = {
     sets: "Sets",
@@ -30,43 +30,196 @@
   ];
 
   const workoutCategories = [
-    "All", "Favorites", "Recent", "Basketball Strength", "Explosive Power", "Vertical Jump",
-    "Upper Body", "Lower Body", "Full Body", "Conditioning", "Recovery", "Core", "Mobility"
+    "All", "Favorites", "Recent", "Basketball Performance", "CrossFit", "Bodybuilding",
+    "Powerlifting", "Olympic Weightlifting", "General Strength", "Athletic Performance",
+    "Running", "Conditioning", "Mobility", "Stretching", "Recovery", "Core Training",
+    "Home Workouts", "Functional Fitness"
   ];
   const workoutDifficulties = ["All", "Beginner", "Intermediate", "Advanced"];
 
-  const workoutDatabase = [
-    workoutTemplate("db-lower-strength", "Basketball Lower Body Strength", "Basketball Strength", "Advanced", "60 min", ["Back Squat 5x5, rest 2-3 min", "Romanian Deadlift 4x8, rest 90 sec", "Bulgarian Split Squat 3x10 each leg", "Calf Raises 3x15", "Tibialis Raises 3x15"], "Heavy lower-body day for force production."),
-    workoutTemplate("db-explosive-jump", "Explosive Jump Day", "Explosive Power", "Advanced", "50 min", ["Hang Clean 5x3, rest 2 min", "Box Jumps 5x5", "Depth Jumps 4x4", "Broad Jumps 4x5", "Sled Push 5 rounds"], "Keep every rep fast and crisp."),
-    workoutTemplate("db-upper-power", "Upper Body Power", "Upper Body", "Intermediate", "55 min", ["Bench Press 5x5", "Pull-Ups 4xMax", "Dumbbell Bench 3x10", "Landmine Press 3x8 each side", "Farmer Carry 4 rounds"], "Build contact strength and upper-body power."),
-    workoutTemplate("db-basketball-conditioning", "Basketball Conditioning", "Conditioning", "Advanced", "40 min", ["Suicides x10", "Assault Bike Intervals 8 rounds", "Tempo Runs 6x100m", "Agility Ladder 5 min", "Defensive Slides 6 rounds"], "Game-speed conditioning with full focus."),
-    workoutTemplate("db-core-stability", "Core & Stability", "Core", "Beginner", "30 min", ["Plank 3x45 sec", "Side Plank 3x30 sec each", "Pallof Press 3x12", "Russian Twists 3x20", "Hanging Leg Raises 3x10"], "Brace hard and move with control."),
-    workoutTemplate("db-vertical-base", "Vertical Jump Base", "Vertical Jump", "Intermediate", "45 min", ["Trap Bar Deadlift 4x5", "Split Squat 3x8 each", "Pogo Jumps 4x20", "Approach Jumps 5x3", "Calf Iso Holds 3x30 sec"], "Strength plus elastic ankle work."),
-    workoutTemplate("db-speed-strength", "Speed Strength Primer", "Explosive Power", "Intermediate", "35 min", ["Power Clean 6x2", "Med Ball Chest Pass 4x5", "Med Ball Slam 4x6", "Band-Resisted Jumps 4x4", "Sprint Starts 6x10m"], "Low volume, high intent."),
-    workoutTemplate("db-upper-hypertrophy", "Upper Body Builder", "Upper Body", "Intermediate", "50 min", ["Incline Bench Press 4x8", "Seated Row 4x10", "Dumbbell Shoulder Press 3x10", "Lat Pulldown 3x12", "Push-Ups 3xMax"], "Steady accessory work for durability."),
-    workoutTemplate("db-lower-accessory", "Lower Body Accessories", "Lower Body", "Beginner", "40 min", ["Goblet Squat 4x10", "Single-Leg RDL 3x10 each", "Step-Ups 3x10 each", "Hamstring Curl 3x12", "Wall Sit 3x45 sec"], "Clean reps and balance side to side."),
-    workoutTemplate("db-full-body-strength", "Full Body Strength", "Full Body", "Intermediate", "55 min", ["Front Squat 4x5", "Bench Press 4x6", "Pull-Ups 4xMax", "Kettlebell Swing 4x12", "Farmer Carry 3 rounds"], "Simple full-body strength day."),
-    workoutTemplate("db-recovery-flow", "Recovery Flow", "Recovery", "Beginner", "25 min", ["Easy Bike 8 min", "Couch Stretch 2 min each", "Hamstring Stretch 2 min each", "Thoracic Rotation 2x10", "Foam Rolling 6 min"], "Keep it easy and leave fresher."),
-    workoutTemplate("db-hip-mobility", "Hip & Ankle Mobility", "Mobility", "Beginner", "22 min", ["Ankle Mobility 3x10 each", "Hip Flexor Stretch 2 min each", "90/90 Switches 3x8", "Cossack Squat 3x6 each", "Deep Squat Hold 3x45 sec"], "Great before lower-body training."),
-    workoutTemplate("db-core-rotation", "Rotational Core", "Core", "Intermediate", "32 min", ["Cable Chop 3x12 each", "Pallof Press 3x12 each", "Med Ball Rotational Throw 4x5 each", "Dead Bug 3x10 each", "Side Plank Reach 3x8 each"], "Control rotation before adding speed."),
-    workoutTemplate("db-court-repeat", "Court Repeat Sprints", "Conditioning", "Intermediate", "35 min", ["Warm-Up Jog 5 min", "Full-Court Sprint 10 reps", "Backpedal to Sprint 6 reps", "Defensive Slide Shuttle 6 reps", "Cooldown Walk 5 min"], "Rest enough to keep quality high."),
-    workoutTemplate("db-jump-landing", "Jump Landing Control", "Vertical Jump", "Beginner", "35 min", ["Snap Downs 4x5", "Box Jump 4x4", "Single-Leg Landing 3x5 each", "Lateral Bounds 3x6 each", "Calf Raises 3x15"], "Quiet landings, strong positions."),
-    workoutTemplate("db-heavy-posterior", "Posterior Chain Strength", "Lower Body", "Advanced", "55 min", ["Deadlift 5x3", "Romanian Deadlift 4x6", "Hip Thrust 4x8", "Nordic Curl 3x5", "Back Extension 3x12"], "Heavy hinge day for power."),
-    workoutTemplate("db-push-pull", "Push Pull Upper", "Upper Body", "Beginner", "42 min", ["Dumbbell Bench Press 4x10", "One-Arm Dumbbell Row 4x10 each", "Strict Press 3x8", "Chin-Ups 3xMax", "Face Pulls 3x15"], "Balanced upper-body session."),
-    workoutTemplate("db-total-athlete", "Total Athlete Circuit", "Full Body", "Intermediate", "38 min", ["Kettlebell Swing 4x12", "Push-Ups 4x15", "Goblet Squat 4x12", "Battle Ropes 4x30 sec", "Plank 4x45 sec"], "Move well, rest 60-90 sec."),
-    workoutTemplate("db-conditioning-engine", "Engine Builder", "Conditioning", "Beginner", "30 min", ["Bike 5 min easy", "Bike 10x30 sec hard / 60 sec easy", "Row 5 min steady", "Jump Rope 5 min", "Breathing Reset 3 min"], "Low impact conditioning."),
-    workoutTemplate("db-basketball-strength-a", "Basketball Strength A", "Basketball Strength", "Intermediate", "50 min", ["Front Squat 4x5", "Bench Press 4x5", "Dumbbell Row 4x10", "Split Squat 3x8 each", "Pallof Press 3x12"], "A balanced in-season strength option."),
-    workoutTemplate("db-basketball-strength-b", "Basketball Strength B", "Basketball Strength", "Intermediate", "48 min", ["Trap Bar Deadlift 4x4", "Landmine Press 4x8", "Pull-Ups 4xMax", "Step-Ups 3x8 each", "Farmer Carry 3 rounds"], "Strength without too much soreness."),
-    workoutTemplate("db-power-clean-day", "Power Clean Technique", "Explosive Power", "Advanced", "45 min", ["Clean Pull 4x3", "Hang Clean 6x2", "Front Squat 3x3", "Box Jump 4x3", "Med Ball Slam 4x5"], "Stop sets before speed drops."),
-    workoutTemplate("db-first-step", "First Step Quickness", "Explosive Power", "Intermediate", "30 min", ["Wall Drill 3x10 each", "Falling Starts 6x10m", "Lateral Push-Off 4x5 each", "Resisted Sprint 6x10m", "Pogo Jumps 3x20"], "Short, sharp acceleration work."),
-    workoutTemplate("db-single-leg-strength", "Single-Leg Strength", "Lower Body", "Intermediate", "45 min", ["Bulgarian Split Squat 4x8 each", "Single-Leg RDL 4x8 each", "Lateral Lunge 3x10 each", "Step-Down 3x8 each", "Calf Raise 3x15 each"], "Build control and knee strength."),
-    workoutTemplate("db-shoulder-care", "Shoulder Care", "Recovery", "Beginner", "24 min", ["Band Pull-Aparts 3x20", "External Rotation 3x15 each", "Scap Push-Ups 3x12", "Wall Slides 3x10", "Child's Pose Breathing 2 min"], "Easy prep for upper-body days."),
-    workoutTemplate("db-mobility-reset", "Full Body Mobility Reset", "Mobility", "Beginner", "28 min", ["World's Greatest Stretch 2x5 each", "Thoracic Rotation 2x10 each", "Couch Stretch 2 min each", "Ankle Rocks 2x15 each", "Deep Squat Breathing 2 min"], "Use on off days or after practice."),
-    workoutTemplate("db-abs-finisher", "10-Min Core Finisher", "Core", "Beginner", "10 min", ["Hollow Hold 3x30 sec", "Bicycle Crunches 3x20", "Leg Raises 3x12", "Plank Shoulder Taps 3x20", "Dead Bug 2x10 each"], "Quick finisher after lifting."),
-    workoutTemplate("db-full-body-power", "Full Body Power", "Full Body", "Advanced", "50 min", ["Power Snatch 5x2", "Push Press 5x3", "Jump Squat 4x5", "Pull-Ups 4xMax", "Sled Push 6 rounds"], "Explosive full-body session."),
-    workoutTemplate("db-tempo-lower", "Tempo Lower Body", "Lower Body", "Intermediate", "46 min", ["Tempo Back Squat 4x6", "Romanian Deadlift 3x8", "Walking Lunges 3x12 each", "Leg Curl 3x12", "Tibialis Raises 3x20"], "Slow eccentrics, strong positions."),
-    workoutTemplate("db-game-day-primer", "Game Day Primer", "Recovery", "Beginner", "18 min", ["Easy Bike 4 min", "Dynamic Warm-Up 5 min", "Pogo Jumps 3x10", "Approach Jumps 3x2", "Band Pull-Aparts 2x15"], "Feel springy, not tired.")
+  const workoutBlueprints = [
+    workoutGroup("Basketball Performance", "Court, weights, bands, cones", ["basketball", "speed", "jump"], [
+      ["Lower Body Strength", "Advanced", "60 min", "Build lower-body force for stronger drives and rebounds.", ["Back Squat 5x5, rest 2-3 min", "Romanian Deadlift 4x8, rest 90 sec", "Bulgarian Split Squat 3x10 each leg, rest 75 sec", "Calf Raises 3x15, rest 45 sec", "Tibialis Raises 3x15, rest 45 sec"]],
+      ["Vertical Jump Day", "Advanced", "50 min", "Train elastic power and max jump output.", ["Hang Clean 5x3, rest 2 min", "Box Jumps 5x5, rest 90 sec", "Depth Jumps 4x4, rest 90 sec", "Broad Jumps 4x5, rest 75 sec", "Sled Push 5 rounds, rest 90 sec"]],
+      ["Explosive Power", "Intermediate", "45 min", "Move light to moderate loads with speed.", ["Trap Bar Jump 5x3, rest 90 sec", "Med Ball Slam 4x6, rest 60 sec", "Push Press 4x4, rest 90 sec", "Lateral Bounds 4x5 each, rest 60 sec", "Sprint Starts 6x10m, rest 60 sec"]],
+      ["First Step Quickness", "Intermediate", "35 min", "Improve short acceleration and change of direction.", ["Wall Drill 3x10 each, rest 30 sec", "Falling Starts 6x10m, rest 60 sec", "Lateral Push-Off 4x5 each, rest 45 sec", "Resisted Sprint 6x10m, rest 75 sec", "Pogo Jumps 3x20, rest 45 sec"]],
+      ["Core Stability", "Beginner", "30 min", "Build trunk control for contact and landing.", ["Dead Bug 3x10 each, rest 30 sec", "Side Plank 3x30 sec each, rest 30 sec", "Pallof Press 3x12 each, rest 45 sec", "Farmer Carry 4x40m, rest 60 sec", "Hollow Hold 3x30 sec, rest 45 sec"]],
+      ["Upper Body Contact Strength", "Intermediate", "50 min", "Build strength for finishes, screens, and body control.", ["Bench Press 5x5, rest 2 min", "Pull-Ups 4xMax, rest 90 sec", "Landmine Press 3x8 each, rest 75 sec", "Dumbbell Row 3x10 each, rest 75 sec", "Farmer Carry 4 rounds, rest 60 sec"]],
+      ["In-Season Strength", "Intermediate", "38 min", "Maintain strength without creating heavy soreness.", ["Front Squat 3x4, rest 2 min", "Bench Press 3x5, rest 90 sec", "Trap Bar Deadlift 3x3, rest 2 min", "Split Squat 2x8 each, rest 60 sec", "Band Pull-Aparts 2x20, rest 30 sec"]],
+      ["Off-Season Strength", "Advanced", "65 min", "Build a bigger strength base away from games.", ["Back Squat 5x5, rest 2-3 min", "Deadlift 4x4, rest 2-3 min", "Dumbbell Bench 4x8, rest 90 sec", "Walking Lunges 3x12 each, rest 75 sec", "Weighted Plank 3x45 sec, rest 60 sec"]],
+      ["Conditioning Day", "Advanced", "40 min", "Repeat hard court efforts with quality movement.", ["Suicides x10, rest 60 sec", "Assault Bike 8x20 sec, rest 70 sec", "Tempo Runs 6x100m, rest 45 sec", "Agility Ladder 5 min", "Defensive Slides 6 rounds, rest 45 sec"]],
+      ["Game Day Primer", "Beginner", "18 min", "Feel warm, springy, and ready without fatigue.", ["Easy Bike 4 min", "Dynamic Warm-Up 5 min", "Pogo Jumps 3x10, rest 30 sec", "Approach Jumps 3x2, rest 45 sec", "Band Pull-Aparts 2x15, rest 30 sec"]]
+    ]),
+    workoutGroup("CrossFit", "Barbell, pull-up bar, rower or bike, kettlebell", ["crossfit", "metcon", "engine"], [
+      ["Simple Engine", "Beginner", "24 min", "Build steady conditioning with simple movements.", ["Row 500m, rest 60 sec", "Air Squats 4x20, rest 30 sec", "Kettlebell Swings 4x15, rest 45 sec", "Sit-Ups 4x20, rest 30 sec"]],
+      ["Full Body Burner", "Intermediate", "30 min", "Hit full-body volume at a strong pace.", ["AMRAP 20 min", "10 Dumbbell Thrusters", "12 Box Jumps", "14 Push-Ups", "200m Run"]],
+      ["Barbell Grind", "Advanced", "35 min", "Practice barbell cycling under fatigue.", ["Deadlift 5x5, rest 90 sec", "Hang Power Clean 5x3, rest 90 sec", "Push Jerk 5x3, rest 90 sec", "Burpees 5x10, rest 60 sec"]],
+      ["Bike Burn", "Intermediate", "26 min", "Use intervals to push repeatable intensity.", ["Assault Bike 10x30 sec hard, rest 60 sec", "Wall Balls 5x15, rest 45 sec", "Plank 5x40 sec, rest 30 sec"]],
+      ["Mini Murph", "Intermediate", "35 min", "Practice a shorter bodyweight hero-style workout.", ["Run 800m", "Pull-Ups 50 reps", "Push-Ups 100 reps", "Air Squats 150 reps", "Run 800m"]],
+      ["Fran Style", "Advanced", "15 min", "Train fast thrusters and pulling volume.", ["21 Thrusters, rest as needed", "21 Pull-Ups", "15 Thrusters", "15 Pull-Ups", "9 Thrusters and 9 Pull-Ups"]],
+      ["Cindy Style", "Beginner", "20 min", "Keep rounds smooth and repeatable.", ["AMRAP 20 min", "5 Pull-Ups", "10 Push-Ups", "15 Air Squats"]],
+      ["Explosive Athlete", "Advanced", "28 min", "Blend power movements with short conditioning.", ["Power Clean 6x2, rest 90 sec", "Box Jump 6x5, rest 60 sec", "Row Sprint 6x150m, rest 75 sec", "Toes-to-Bar 4x10, rest 60 sec"]],
+      ["Gym Grinder", "Intermediate", "32 min", "Grind through mixed gym movements.", ["5 rounds", "12 Dumbbell Snatches", "15 Wall Balls", "12 Toes-to-Bar", "250m Row, rest 60 sec"]],
+      ["AMRAP 20", "Intermediate", "20 min", "Score quality rounds in twenty minutes.", ["AMRAP 20 min", "10 Kettlebell Swings", "10 Burpees", "10 Goblet Squats", "200m Run"]]
+    ]),
+    workoutGroup("Bodybuilding", "Dumbbells, machines, cables, bench", ["hypertrophy", "pump", "muscle"], [
+      ["Chest Day", "Intermediate", "55 min", "Build chest size with presses and flyes.", ["Bench Press 4x8, rest 90 sec", "Incline Dumbbell Press 4x10, rest 75 sec", "Cable Fly 3x12, rest 60 sec", "Push-Ups 3xMax, rest 60 sec"]],
+      ["Back Day", "Intermediate", "55 min", "Train lats, upper back, and rows.", ["Pull-Ups 4xMax, rest 90 sec", "Barbell Row 4x8, rest 90 sec", "Lat Pulldown 3x12, rest 60 sec", "Seated Row 3x12, rest 60 sec", "Face Pulls 3x15, rest 45 sec"]],
+      ["Leg Day", "Advanced", "65 min", "Build quad, hamstring, and glute volume.", ["Back Squat 4x8, rest 2 min", "Leg Press 4x12, rest 90 sec", "Romanian Deadlift 4x10, rest 90 sec", "Leg Curl 3x12, rest 60 sec", "Calf Raises 4x15, rest 45 sec"]],
+      ["Shoulder Day", "Intermediate", "45 min", "Build shoulders with presses and raises.", ["Dumbbell Shoulder Press 4x10, rest 75 sec", "Lateral Raise 4x12, rest 45 sec", "Rear Delt Fly 3x15, rest 45 sec", "Upright Row 3x10, rest 60 sec"]],
+      ["Arm Day", "Beginner", "40 min", "Simple biceps and triceps volume.", ["Barbell Curl 4x10, rest 60 sec", "Cable Pressdown 4x12, rest 60 sec", "Hammer Curl 3x12, rest 45 sec", "Overhead Triceps Extension 3x12, rest 45 sec"]],
+      ["Push Day", "Intermediate", "55 min", "Train chest, shoulders, and triceps.", ["Incline Bench Press 4x8, rest 90 sec", "Dumbbell Bench 3x10, rest 75 sec", "Strict Press 3x8, rest 90 sec", "Dips 3xMax, rest 60 sec", "Lateral Raise 3x15, rest 45 sec"]],
+      ["Pull Day", "Intermediate", "55 min", "Train back, rear delts, and biceps.", ["Deadlift 3x5, rest 2 min", "Pull-Ups 4xMax, rest 90 sec", "Chest-Supported Row 4x10, rest 75 sec", "Face Pulls 3x15, rest 45 sec", "Dumbbell Curl 3x12, rest 45 sec"]],
+      ["Upper Body Pump", "Beginner", "42 min", "Get quality upper-body volume with moderate load.", ["Dumbbell Bench 3x12, rest 60 sec", "Lat Pulldown 3x12, rest 60 sec", "Seated Dumbbell Press 3x12, rest 60 sec", "Cable Row 3x12, rest 60 sec", "Pushdowns 3x15, rest 45 sec"]],
+      ["Lower Body Hypertrophy", "Intermediate", "52 min", "Build legs with controlled reps.", ["Front Squat 4x8, rest 90 sec", "Walking Lunge 3x12 each, rest 75 sec", "Hip Thrust 4x10, rest 75 sec", "Leg Extension 3x15, rest 45 sec", "Calf Raises 4x15, rest 45 sec"]],
+      ["Full Body Hypertrophy", "Intermediate", "58 min", "Train major muscle groups in one session.", ["Goblet Squat 4x12, rest 75 sec", "Dumbbell Bench 4x10, rest 75 sec", "Seated Row 4x10, rest 75 sec", "Romanian Deadlift 3x10, rest 90 sec", "Lateral Raise 3x15, rest 45 sec"]]
+    ]),
+    workoutGroup("Powerlifting", "Squat rack, bench, barbell, plates", ["powerlifting", "strength", "barbell"], [
+      ["Squat Focus", "Advanced", "60 min", "Build squat strength with accessories.", ["Back Squat 5x3, rest 3 min", "Pause Squat 3x3, rest 2 min", "Romanian Deadlift 3x8, rest 90 sec", "Leg Press 3x10, rest 90 sec"]],
+      ["Bench Focus", "Advanced", "55 min", "Build stronger pressing and lockout.", ["Bench Press 5x3, rest 3 min", "Close-Grip Bench 4x5, rest 2 min", "Dumbbell Row 4x10, rest 75 sec", "Triceps Pressdown 3x15, rest 45 sec"]],
+      ["Deadlift Focus", "Advanced", "60 min", "Improve pulling strength and posterior chain.", ["Deadlift 5x3, rest 3 min", "Deficit Deadlift 3x3, rest 2 min", "Hip Thrust 4x8, rest 90 sec", "Back Extension 3x12, rest 60 sec"]],
+      ["5x5 Strength", "Intermediate", "60 min", "Use simple volume for strength progress.", ["Back Squat 5x5, rest 2 min", "Bench Press 5x5, rest 2 min", "Barbell Row 5x5, rest 90 sec", "Plank 3x60 sec, rest 45 sec"]],
+      ["Heavy Triple Day", "Advanced", "50 min", "Practice heavy triples with control.", ["Back Squat 4x3, rest 3 min", "Bench Press 4x3, rest 3 min", "Deadlift 3x3, rest 3 min", "Band Pull-Aparts 3x20, rest 30 sec"]],
+      ["Pause Squat Day", "Intermediate", "50 min", "Build positions and power out of the bottom.", ["Pause Squat 5x3, rest 2 min", "Front Squat 3x5, rest 2 min", "Bulgarian Split Squat 3x8 each, rest 75 sec", "Dead Bug 3x10 each, rest 30 sec"]],
+      ["Speed Bench Day", "Intermediate", "45 min", "Move the bar fast with repeatable form.", ["Speed Bench 8x3, rest 60 sec", "Incline Dumbbell Press 3x10, rest 75 sec", "Chest-Supported Row 4x10, rest 75 sec", "Face Pulls 3x15, rest 45 sec"]],
+      ["Posterior Chain Day", "Advanced", "55 min", "Strengthen the muscles that drive the pull.", ["Romanian Deadlift 4x6, rest 2 min", "Good Morning 3x8, rest 90 sec", "Hamstring Curl 4x10, rest 60 sec", "Farmer Carry 4x40m, rest 60 sec"]],
+      ["Max Effort Lower", "Advanced", "65 min", "Work up to a heavy lower-body effort.", ["Back Squat 1x3 heavy, rest as needed", "Back-Off Squat 3x5, rest 2 min", "Deadlift 3x3, rest 3 min", "Walking Lunge 3x10 each, rest 75 sec"]],
+      ["Max Effort Upper", "Advanced", "60 min", "Work up to a heavy upper-body effort.", ["Bench Press 1x3 heavy, rest as needed", "Close-Grip Bench 3x5, rest 2 min", "Pull-Ups 4xMax, rest 90 sec", "Seated Row 4x10, rest 75 sec"]]
+    ]),
+    workoutGroup("Olympic Weightlifting", "Barbell, bumper plates, platform, blocks", ["olympic lifting", "technique", "power"], [
+      ["Clean Technique", "Intermediate", "45 min", "Dial in clean positions and turnover.", ["Clean Pull 4x3, rest 90 sec", "Hang Clean 6x2, rest 90 sec", "Front Squat 4x3, rest 2 min", "Tall Clean 3x3, rest 60 sec"]],
+      ["Snatch Technique", "Intermediate", "45 min", "Build snatch timing and overhead position.", ["Snatch Pull 4x3, rest 90 sec", "Hang Snatch 6x2, rest 90 sec", "Overhead Squat 4x3, rest 2 min", "Snatch Balance 3x3, rest 90 sec"]],
+      ["Clean Pull Day", "Advanced", "42 min", "Strengthen the clean pull path.", ["Clean Pull 5x3, rest 2 min", "Clean Deadlift 4x4, rest 2 min", "Front Squat 3x3, rest 2 min", "Box Jump 4x3, rest 60 sec"]],
+      ["Snatch Pull Day", "Advanced", "42 min", "Build stronger snatch extension.", ["Snatch Pull 5x3, rest 2 min", "Snatch Deadlift 4x4, rest 2 min", "Overhead Squat 3x3, rest 2 min", "Broad Jump 4x3, rest 60 sec"]],
+      ["Jerk Technique", "Intermediate", "40 min", "Practice dip, drive, and stable lockout.", ["Push Press 4x4, rest 90 sec", "Power Jerk 5x2, rest 90 sec", "Split Jerk 5x2, rest 2 min", "Jerk Recovery 3x3, rest 90 sec"]],
+      ["Power Clean Day", "Advanced", "50 min", "Train explosive clean power.", ["Power Clean 6x2, rest 2 min", "Clean Pull 4x3, rest 2 min", "Front Squat 4x3, rest 2 min", "Med Ball Slam 4x5, rest 45 sec"]],
+      ["Hang Snatch Day", "Intermediate", "45 min", "Improve speed under the bar.", ["Muscle Snatch 3x4, rest 60 sec", "Hang Snatch 6x2, rest 90 sec", "Snatch Balance 4x2, rest 90 sec", "Overhead Squat 3x4, rest 90 sec"]],
+      ["Front Squat + Clean", "Advanced", "55 min", "Pair clean skill with front squat strength.", ["Clean 6x2, rest 2 min", "Front Squat 5x3, rest 2 min", "Clean Pull 3x3, rest 2 min", "Plank 3x60 sec, rest 45 sec"]],
+      ["Overhead Stability", "Beginner", "35 min", "Build stable shoulders and overhead control.", ["Overhead Squat 4x5, rest 90 sec", "Snatch Grip Press 3x8, rest 75 sec", "Waiter Carry 4x30m, rest 60 sec", "Wall Slides 3x12, rest 30 sec"]],
+      ["Full Olympic Session", "Advanced", "70 min", "Practice snatch, clean, jerk, and squat work.", ["Snatch 6x2, rest 2 min", "Clean and Jerk 6x1, rest 2 min", "Front Squat 4x3, rest 2 min", "Snatch Pull 3x3, rest 2 min"]]
+    ]),
+    workoutGroup("General Strength", "Dumbbells, barbell, kettlebell, bench", ["strength", "fitness", "basic"], [
+      ["Full Body Strength", "Intermediate", "55 min", "Build simple strength across the whole body.", ["Front Squat 4x5, rest 2 min", "Bench Press 4x6, rest 90 sec", "Pull-Ups 4xMax, rest 90 sec", "Kettlebell Swing 4x12, rest 60 sec", "Farmer Carry 3 rounds, rest 60 sec"]],
+      ["Beginner Strength A", "Beginner", "40 min", "Learn basic strength movements.", ["Goblet Squat 3x10, rest 60 sec", "Push-Ups 3xMax, rest 60 sec", "Dumbbell Row 3x10 each, rest 60 sec", "Plank 3x30 sec, rest 30 sec"]],
+      ["Beginner Strength B", "Beginner", "40 min", "Build confidence with simple lifts.", ["Trap Bar Deadlift 3x5, rest 90 sec", "Dumbbell Bench 3x10, rest 60 sec", "Lat Pulldown 3x10, rest 60 sec", "Step-Ups 3x8 each, rest 60 sec"]],
+      ["Dumbbell Strength", "Intermediate", "45 min", "Use dumbbells for strong full-body work.", ["Dumbbell Squat 4x10, rest 75 sec", "Dumbbell Bench 4x8, rest 75 sec", "Dumbbell Row 4x10 each, rest 75 sec", "Dumbbell RDL 3x10, rest 75 sec"]],
+      ["Kettlebell Strength", "Intermediate", "42 min", "Train strength with kettlebell basics.", ["Goblet Squat 4x10, rest 75 sec", "Kettlebell Swing 5x12, rest 60 sec", "Kettlebell Press 3x8 each, rest 75 sec", "Suitcase Carry 4x30m, rest 60 sec"]],
+      ["Upper/Lower Split", "Intermediate", "50 min", "Blend upper and lower strength in one session.", ["Back Squat 4x6, rest 2 min", "Incline Bench 4x8, rest 90 sec", "Romanian Deadlift 3x8, rest 90 sec", "Seated Row 3x10, rest 75 sec"]],
+      ["Posterior Chain", "Intermediate", "45 min", "Strengthen glutes, hamstrings, and back.", ["Deadlift 4x5, rest 2 min", "Hip Thrust 4x8, rest 90 sec", "Back Extension 3x12, rest 60 sec", "Hamstring Curl 3x12, rest 60 sec"]],
+      ["Push/Pull Strength", "Intermediate", "45 min", "Balance pressing and pulling strength.", ["Bench Press 4x6, rest 90 sec", "Barbell Row 4x8, rest 90 sec", "Strict Press 3x6, rest 90 sec", "Pull-Ups 3xMax, rest 90 sec"]],
+      ["Squat Rack Day", "Advanced", "55 min", "Make the most of a rack and barbell.", ["Back Squat 5x5, rest 2 min", "Front Squat 3x5, rest 2 min", "Strict Press 4x6, rest 90 sec", "Barbell Lunges 3x8 each, rest 75 sec"]],
+      ["Bench + Back", "Intermediate", "48 min", "Pair pressing strength with upper-back work.", ["Bench Press 5x5, rest 2 min", "Pull-Ups 4xMax, rest 90 sec", "Dumbbell Bench 3x10, rest 75 sec", "Cable Row 4x10, rest 75 sec"]]
+    ]),
+    workoutGroup("Athletic Performance", "Cones, sled, medicine ball, weights", ["athlete", "power", "agility"], [
+      ["Total Athlete Circuit", "Intermediate", "38 min", "Build athletic work capacity.", ["Kettlebell Swing 4x12, rest 45 sec", "Push-Ups 4x15, rest 45 sec", "Goblet Squat 4x12, rest 45 sec", "Battle Ropes 4x30 sec, rest 45 sec", "Plank 4x45 sec, rest 30 sec"]],
+      ["Speed Strength Primer", "Intermediate", "35 min", "Prime fast strength and low-volume power.", ["Power Clean 6x2, rest 90 sec", "Med Ball Chest Pass 4x5, rest 45 sec", "Med Ball Slam 4x6, rest 45 sec", "Band-Resisted Jumps 4x4, rest 60 sec", "Sprint Starts 6x10m, rest 60 sec"]],
+      ["Jump Landing Control", "Beginner", "35 min", "Own safe, quiet landings.", ["Snap Downs 4x5, rest 45 sec", "Box Jump 4x4, rest 60 sec", "Single-Leg Landing 3x5 each, rest 45 sec", "Lateral Bounds 3x6 each, rest 45 sec", "Calf Raises 3x15, rest 45 sec"]],
+      ["Acceleration Day", "Intermediate", "34 min", "Improve first steps and sprint mechanics.", ["A-Skips 3x20m, rest 30 sec", "Wall Drives 3x10 each, rest 30 sec", "Falling Starts 8x10m, rest 60 sec", "Sled Push 6x15m, rest 75 sec"]],
+      ["Agility Circuit", "Intermediate", "36 min", "Train cuts, brakes, and re-acceleration.", ["Pro Agility 6 reps, rest 60 sec", "L Drill 5 reps, rest 60 sec", "Cone Shuffle 4x20 sec, rest 40 sec", "Backpedal to Sprint 6 reps, rest 60 sec"]],
+      ["Power Endurance", "Advanced", "42 min", "Repeat explosive efforts while tired.", ["Broad Jump 5x3, rest 60 sec", "Med Ball Throw 5x5, rest 45 sec", "Sled Push 8x20m, rest 60 sec", "Assault Bike 6x20 sec, rest 70 sec"]],
+      ["Single-Leg Power", "Intermediate", "40 min", "Build unilateral power and control.", ["Single-Leg Box Jump 4x3 each, rest 60 sec", "Split Squat Jump 4x5 each, rest 60 sec", "Single-Leg RDL 3x8 each, rest 75 sec", "Lateral Bounds 4x5 each, rest 60 sec"]],
+      ["Medicine Ball Power", "Beginner", "30 min", "Use medicine ball throws for simple power.", ["Med Ball Chest Pass 5x5, rest 45 sec", "Med Ball Slam 5x5, rest 45 sec", "Rotational Throw 4x5 each, rest 45 sec", "Overhead Throw 4x5, rest 45 sec"]],
+      ["Reactive Footwork", "Intermediate", "30 min", "Improve fast feet and reaction work.", ["Jump Rope 4x60 sec, rest 30 sec", "Agility Ladder 6 min", "Mirror Shuffle 6x20 sec, rest 40 sec", "Sprint Reaction 8 reps, rest 45 sec"]],
+      ["Athletic Deload", "Beginner", "28 min", "Stay sharp while reducing stress.", ["Tempo Run 8 min easy", "Mobility Flow 8 min", "Pogo Jumps 3x10, rest 30 sec", "Light Med Ball Throws 3x5, rest 45 sec"]]
+    ]),
+    workoutGroup("Running", "Running shoes, track or open route", ["running", "speed", "endurance"], [
+      ["Easy Run", "Beginner", "30 min", "Build aerobic base at a comfortable pace.", ["Easy Run 25 min", "Walk Cooldown 5 min", "Optional Strides 4x15 sec, rest 45 sec"]],
+      ["Tempo Run", "Intermediate", "34 min", "Train comfortably hard aerobic pace.", ["Easy Jog 8 min", "Tempo Run 4x4 min, rest 2 min easy", "Strides 4x20 sec, rest 45 sec", "Cooldown 5 min"]],
+      ["Sprint Intervals", "Advanced", "28 min", "Practice fast sprint efforts with full rest.", ["Warm-Up Jog 8 min", "Sprint 8x60m, rest 90 sec", "Walk Cooldown 5 min"]],
+      ["Hill Sprints", "Advanced", "30 min", "Build power and sprint mechanics uphill.", ["Warm-Up 10 min", "Hill Sprint 8x12 sec, walk back rest", "Easy Jog 6 min", "Mobility 4 min"]],
+      ["400m Repeats", "Intermediate", "45 min", "Build speed endurance with track repeats.", ["Warm-Up Jog 10 min", "400m Run x6, rest 90 sec", "Cooldown Jog 8 min"]],
+      ["800m Repeats", "Advanced", "55 min", "Improve longer interval tolerance.", ["Warm-Up Jog 10 min", "800m Run x5, rest 2 min", "Cooldown Jog 10 min"]],
+      ["Mile Test", "Intermediate", "25 min", "Test one-mile fitness.", ["Warm-Up Jog 8 min", "Strides 4x20 sec, rest 45 sec", "Mile Run 1x, record time", "Cooldown Walk 5 min"]],
+      ["5K Prep", "Intermediate", "45 min", "Build rhythm for a strong 5K.", ["Easy Run 10 min", "Run 3x8 min at 5K effort, rest 3 min easy", "Cooldown 8 min"]],
+      ["Recovery Run", "Beginner", "25 min", "Move easy and recover between harder sessions.", ["Easy Jog 20 min", "Walk 3 min", "Light Stretch 2 min"]],
+      ["Speed Endurance", "Advanced", "40 min", "Hold speed for longer sprint intervals.", ["Warm-Up 10 min", "200m Run x8, rest 90 sec", "100m Float x4, rest 60 sec", "Cooldown 8 min"]]
+    ]),
+    workoutGroup("Conditioning", "Bike, rower, kettlebell, dumbbells", ["conditioning", "engine", "work capacity"], [
+      ["Assault Bike Intervals", "Intermediate", "24 min", "Build repeatable high-intensity output.", ["Assault Bike 10x30 sec hard, rest 60 sec", "Easy Pedal 5 min", "Breathing Reset 3 min"]],
+      ["EMOM Conditioning", "Intermediate", "20 min", "Stay on the minute and manage fatigue.", ["EMOM 20 min", "Min 1: 12 Kettlebell Swings", "Min 2: 10 Burpees", "Min 3: 14 Wall Balls", "Min 4: Rest"]],
+      ["Circuit Conditioning", "Beginner", "30 min", "Use simple circuits for steady sweat.", ["4 rounds", "15 Air Squats", "12 Push-Ups", "15 Sit-Ups", "200m Run, rest 60 sec"]],
+      ["Sprint Conditioning", "Advanced", "32 min", "Repeat hard sprints with quality.", ["Warm-Up 8 min", "Sprint 10x100m, rest 60 sec", "Cooldown Walk 6 min"]],
+      ["Legs and Lungs", "Advanced", "28 min", "Challenge lower body and breathing.", ["5 rounds", "20 Walking Lunges", "15 Wall Balls", "12 Box Jumps", "250m Row, rest 60 sec"]],
+      ["Burpee Burner", "Intermediate", "18 min", "Use burpees for a short, tough finisher.", ["Burpees 10-9-8-7-6-5-4-3-2-1", "Air Squats 10 reps after each set", "Rest as needed"]],
+      ["Kettlebell Conditioning", "Intermediate", "25 min", "Move a kettlebell with steady pace.", ["5 rounds", "15 Kettlebell Swings", "10 Goblet Squats", "8 Kettlebell Press each", "Rest 60 sec"]],
+      ["Full Body Sweat", "Beginner", "26 min", "Simple mixed conditioning for any day.", ["4 rounds", "Jump Rope 60 sec", "Dumbbell Thruster 12 reps", "Mountain Climbers 30 sec", "Rest 60 sec"]],
+      ["Core Conditioning", "Intermediate", "22 min", "Blend core work and breathing.", ["4 rounds", "Plank 45 sec", "Russian Twists 20 reps", "Row 250m", "Rest 60 sec"]],
+      ["Low Impact Conditioning", "Beginner", "30 min", "Build conditioning without pounding joints.", ["Bike 5 min easy", "Bike 8x45 sec moderate, rest 45 sec", "Farmer Carry 5x40m, rest 45 sec", "Cooldown Walk 5 min"]]
+    ]),
+    workoutGroup("Mobility", "Mat, band, foam roller", ["mobility", "range", "movement"], [
+      ["Full Body Mobility", "Beginner", "25 min", "Open common tight areas from training.", ["World's Greatest Stretch 2x5 each", "Thoracic Rotation 2x10 each", "Deep Squat Hold 3x45 sec", "Shoulder CARs 2x8 each", "Breathing 3 min"]],
+      ["Hip Mobility", "Beginner", "20 min", "Improve hip range for squats and sport.", ["90/90 Switches 3x8", "Hip Flexor Stretch 2 min each", "Cossack Squat 3x6 each", "Pigeon Stretch 90 sec each"]],
+      ["Ankle Mobility", "Beginner", "18 min", "Build ankle range for squats, jumps, and running.", ["Ankle Rocks 3x15 each", "Knee-to-Wall 3x10 each", "Calf Stretch 2 min each", "Tibialis Raises 3x15"]],
+      ["Shoulder Mobility", "Beginner", "20 min", "Improve overhead and pressing positions.", ["Band Dislocates 3x12", "Wall Slides 3x10", "Thread the Needle 2x10 each", "Lat Stretch 2 min each"]],
+      ["Thoracic Reset", "Beginner", "18 min", "Restore upper-back rotation.", ["Open Books 3x10 each", "Foam Roller Extensions 3x8", "Quadruped Rotation 3x8 each", "Child's Pose Breathing 2 min"]],
+      ["Squat Mobility", "Intermediate", "22 min", "Prep hips and ankles for better squats.", ["Goblet Squat Hold 4x45 sec", "Ankle Rocks 3x12 each", "Cossack Squat 3x6 each", "Hip Airplanes 2x6 each"]],
+      ["Overhead Mobility", "Intermediate", "24 min", "Prep shoulders for overhead lifting.", ["PVC Pass-Through 3x12", "Lat Stretch 2 min each", "Overhead Squat Hold 4x30 sec", "Scap Push-Ups 3x12"]],
+      ["Runner Mobility", "Beginner", "20 min", "Open calves, hips, and hamstrings after running.", ["Calf Stretch 2 min each", "Hamstring Floss 2x12 each", "Couch Stretch 2 min each", "Glute Bridge 3x12"]],
+      ["Desk Reset Mobility", "Beginner", "15 min", "Undo stiffness from sitting.", ["Neck CARs 2x5 each", "Thoracic Rotation 2x10 each", "Hip Flexor Stretch 90 sec each", "Deep Breathing 2 min"]],
+      ["Pre-Lift Mobility", "Beginner", "16 min", "Quick prep before strength training.", ["Dynamic Lunge 2x8 each", "Band Pull-Aparts 2x20", "Ankle Rocks 2x12 each", "Bodyweight Squat 2x10"]]
+    ]),
+    workoutGroup("Stretching", "Mat, strap or towel", ["stretching", "flexibility", "cooldown"], [
+      ["Hamstring Stretch", "Beginner", "12 min", "Ease hamstring tightness.", ["Supine Hamstring Stretch 2 min each", "Toe Touch Breathing 2 min", "Down Dog Pedal 2x60 sec", "Easy Walk 2 min"]],
+      ["Back Recovery", "Beginner", "18 min", "Calm the back with gentle movement.", ["Child's Pose 2 min", "Cat-Cow 3x10", "Open Book 2x10 each", "Knees-to-Chest 2 min", "Breathing 3 min"]],
+      ["Post-Leg Day Stretch", "Beginner", "22 min", "Downshift after a hard lower-body day.", ["Couch Stretch 2 min each", "Pigeon Stretch 2 min each", "Hamstring Stretch 2 min each", "Calf Stretch 90 sec each"]],
+      ["Game Day Warm-Up", "Beginner", "15 min", "Move dynamically before competition.", ["High Knees 2x20m", "Butt Kicks 2x20m", "Lateral Shuffle 2x20m", "World's Greatest Stretch 2x5 each", "Pogo Jumps 2x10"]],
+      ["Recovery Flow", "Beginner", "25 min", "Relax and restore with easy positions.", ["Easy Bike 5 min", "Couch Stretch 2 min each", "Hamstring Stretch 2 min each", "Thoracic Rotation 2x10", "Breathing 4 min"]],
+      ["Deep Stretch", "Beginner", "30 min", "Hold longer stretches to unwind.", ["Pigeon Stretch 3 min each", "Frog Stretch 3 min", "Lat Stretch 2 min each", "Forward Fold 3 min", "Box Breathing 4 min"]],
+      ["Upper Body Stretch", "Beginner", "16 min", "Open chest, lats, and shoulders.", ["Doorway Pec Stretch 2 min each", "Lat Stretch 2 min each", "Triceps Stretch 90 sec each", "Wrist Stretch 2 min"]],
+      ["Lower Body Stretch", "Beginner", "20 min", "Stretch hips, quads, hamstrings, and calves.", ["Hip Flexor Stretch 2 min each", "Quad Stretch 2 min each", "Hamstring Stretch 2 min each", "Calf Stretch 2 min each"]],
+      ["Evening Stretch", "Beginner", "18 min", "Use low-intensity stretching before bed.", ["Forward Fold 2 min", "Supine Twist 2 min each", "Happy Baby 2 min", "Box Breathing 5 min"]],
+      ["Quick Cooldown", "Beginner", "10 min", "A fast cooldown after training.", ["Walk 3 min", "Couch Stretch 60 sec each", "Lat Stretch 60 sec each", "Hamstring Stretch 60 sec each", "Breathing 2 min"]]
+    ]),
+    workoutGroup("Recovery", "Bike, foam roller, band, mat", ["recovery", "easy", "restore"], [
+      ["Recovery Flow", "Beginner", "25 min", "Leave the session feeling better than when you started.", ["Easy Bike 8 min", "Foam Roll Quads 2 min", "Hip Flexor Stretch 2 min each", "Thoracic Rotation 2x10 each", "Breathing Reset 4 min"]],
+      ["Back Recovery", "Beginner", "18 min", "Reduce stiffness with gentle movement.", ["Cat-Cow 3x10", "Child's Pose Breathing 3 min", "Open Book 2x10 each", "Glute Bridge 3x12", "Walk 5 min"]],
+      ["Shoulder Care", "Beginner", "24 min", "Support shoulders after pressing or throwing.", ["Band Pull-Aparts 3x20", "External Rotation 3x15 each", "Scap Push-Ups 3x12", "Wall Slides 3x10", "Child's Pose Breathing 2 min"]],
+      ["Light Flush Ride", "Beginner", "22 min", "Get blood moving without fatigue.", ["Bike 18 min easy", "Calf Stretch 90 sec each", "Breathing 2 min"]],
+      ["Post-Run Recovery", "Beginner", "20 min", "Recover calves, hips, and hamstrings.", ["Walk 5 min", "Calf Stretch 2 min each", "Hamstring Stretch 2 min each", "Hip Flexor Stretch 2 min each"]],
+      ["Post-Lift Reset", "Beginner", "20 min", "Cool down after strength training.", ["Easy Row 5 min", "Foam Roll Back 2 min", "Pigeon Stretch 90 sec each", "Lat Stretch 90 sec each", "Box Breathing 4 min"]],
+      ["Rest Day Movement", "Beginner", "30 min", "Stay loose on a non-training day.", ["Walk 20 min", "World's Greatest Stretch 2x5 each", "Ankle Rocks 2x12 each", "Breathing 3 min"]],
+      ["Knee-Friendly Recovery", "Beginner", "20 min", "Move gently around sore knees.", ["Bike 8 min easy", "Spanish Squat Hold 4x30 sec, rest 30 sec", "Tibialis Raises 3x15", "Calf Stretch 2 min each"]],
+      ["Sleep Prep Recovery", "Beginner", "15 min", "Downshift the nervous system.", ["Forward Fold 2 min", "Supine Twist 2 min each", "Legs Up Wall 4 min", "Box Breathing 5 min"]],
+      ["Travel Recovery", "Beginner", "18 min", "Loosen up after sitting or travel.", ["Walk 5 min", "Hip Flexor Stretch 90 sec each", "Thoracic Rotation 2x10 each", "Calf Raises 2x20", "Breathing 3 min"]]
+    ]),
+    workoutGroup("Core Training", "Mat, cable or band, medicine ball", ["core", "stability", "abs"], [
+      ["Core Stability", "Beginner", "30 min", "Brace better for lifting and sport.", ["Plank 3x45 sec, rest 30 sec", "Side Plank 3x30 sec each, rest 30 sec", "Pallof Press 3x12 each, rest 45 sec", "Dead Bug 3x10 each, rest 30 sec"]],
+      ["Plank Builder", "Beginner", "18 min", "Build basic plank endurance.", ["Front Plank 4x30 sec, rest 30 sec", "Side Plank 3x25 sec each, rest 30 sec", "Plank Shoulder Tap 3x20, rest 45 sec"]],
+      ["Rotational Core", "Intermediate", "32 min", "Train rotation with control.", ["Cable Chop 3x12 each, rest 45 sec", "Med Ball Rotational Throw 4x5 each, rest 45 sec", "Russian Twists 3x20, rest 45 sec", "Side Plank Reach 3x8 each, rest 45 sec"]],
+      ["Anti-Rotation Core", "Intermediate", "28 min", "Resist movement and hold strong positions.", ["Pallof Press 4x12 each, rest 45 sec", "Suitcase Carry 4x30m each, rest 60 sec", "Dead Bug 3x10 each, rest 30 sec", "Bear Crawl 4x20m, rest 60 sec"]],
+      ["Hanging Core", "Advanced", "25 min", "Train strong abs and grip from the bar.", ["Hanging Knee Raise 4x10, rest 60 sec", "Toes-to-Bar 4x8, rest 75 sec", "Hollow Hold 4x30 sec, rest 45 sec", "Dead Hang 3x45 sec, rest 45 sec"]],
+      ["Athletic Core", "Intermediate", "30 min", "Blend core control and power.", ["Med Ball Slam 4x8, rest 45 sec", "Pallof Press 3x12 each, rest 45 sec", "Farmer Carry 4x40m, rest 60 sec", "Plank 3x60 sec, rest 45 sec"]],
+      ["10-Min Abs", "Beginner", "10 min", "Quick abs finisher.", ["Hollow Hold 3x30 sec, rest 20 sec", "Bicycle Crunches 3x20, rest 20 sec", "Leg Raises 3x12, rest 20 sec", "Plank 1x60 sec"]],
+      ["Low Back Strength", "Beginner", "25 min", "Build support around the low back.", ["Bird Dog 3x10 each, rest 30 sec", "Glute Bridge 4x12, rest 45 sec", "Back Extension 3x12, rest 60 sec", "Side Plank 3x25 sec each, rest 30 sec"]],
+      ["Medicine Ball Core", "Intermediate", "24 min", "Use medicine ball power for core training.", ["Med Ball Slam 5x6, rest 45 sec", "Rotational Throw 4x5 each, rest 45 sec", "Med Ball Sit-Up 3x12, rest 45 sec", "Overhead Carry 3x30m, rest 60 sec"]],
+      ["Bodyweight Core", "Beginner", "20 min", "Simple core work with no equipment.", ["Sit-Ups 4x15, rest 30 sec", "Leg Raises 4x10, rest 30 sec", "Mountain Climbers 4x30 sec, rest 30 sec", "Side Plank 3x30 sec each, rest 30 sec"]]
+    ]),
+    workoutGroup("Home Workouts", "Bodyweight, jump rope, optional dumbbells", ["home", "bodyweight", "simple"], [
+      ["No Equipment Full Body", "Beginner", "24 min", "Train anywhere with bodyweight movements.", ["Air Squats 4x20, rest 45 sec", "Push-Ups 4x12, rest 45 sec", "Reverse Lunges 4x10 each, rest 45 sec", "Plank 4x30 sec, rest 30 sec"]],
+      ["Push-Up/Squat Circuit", "Beginner", "18 min", "Use two simple moves for steady work.", ["10 rounds", "10 Push-Ups", "15 Air Squats", "Rest 30 sec"]],
+      ["Core at Home", "Beginner", "15 min", "Quick core session with no equipment.", ["Dead Bug 3x10 each, rest 30 sec", "Plank 3x45 sec, rest 30 sec", "Bicycle Crunches 3x20, rest 30 sec", "Side Plank 2x30 sec each, rest 30 sec"]],
+      ["Jump Rope Conditioning", "Intermediate", "20 min", "Build foot speed and conditioning.", ["Jump Rope 10x60 sec, rest 30 sec", "Air Squats 5x15, rest 30 sec", "Push-Ups 5x10, rest 30 sec"]],
+      ["Bodyweight Legs", "Intermediate", "25 min", "Train legs at home without weights.", ["Tempo Air Squat 4x15, rest 45 sec", "Reverse Lunge 4x12 each, rest 45 sec", "Single-Leg Glute Bridge 3x12 each, rest 45 sec", "Wall Sit 3x60 sec, rest 45 sec"]],
+      ["Beginner Home Workout", "Beginner", "20 min", "A simple starter workout for consistency.", ["3 rounds", "12 Air Squats", "8 Push-Ups", "12 Glute Bridges", "30 sec Plank, rest 60 sec"]],
+      ["Advanced Home Workout", "Advanced", "32 min", "Push bodyweight intensity at home.", ["5 rounds", "20 Jump Squats", "15 Push-Ups", "20 Walking Lunges", "10 Burpees, rest 60 sec"]],
+      ["Hotel Room Workout", "Intermediate", "22 min", "Train in a small space while traveling.", ["4 rounds", "15 Air Squats", "12 Push-Ups", "12 Reverse Lunges each", "30 sec Mountain Climbers, rest 60 sec"]],
+      ["20-Min Sweat", "Intermediate", "20 min", "Fast full-body sweat session.", ["AMRAP 20 min", "10 Burpees", "20 Air Squats", "15 Sit-Ups", "30 Jumping Jacks"]],
+      ["Mobility at Home", "Beginner", "18 min", "Stay loose with a simple at-home flow.", ["World's Greatest Stretch 2x5 each", "Couch Stretch 90 sec each", "Thoracic Rotation 2x10 each", "Forward Fold 2 min"]]
+    ]),
+    workoutGroup("Functional Fitness", "Dumbbells, kettlebells, sled, sandbag", ["functional", "carry", "work capacity"], [
+      ["Farmer Carry Day", "Intermediate", "35 min", "Build grip, trunk, and carry strength.", ["Farmer Carry 6x40m, rest 60 sec", "Goblet Squat 4x10, rest 60 sec", "Push-Ups 4x15, rest 45 sec", "Suitcase Carry 4x30m each, rest 60 sec"]],
+      ["Sled Push Day", "Advanced", "34 min", "Build leg drive and conditioning.", ["Sled Push 8x20m, rest 75 sec", "Reverse Sled Drag 6x20m, rest 60 sec", "Walking Lunges 3x12 each, rest 60 sec", "Plank 3x45 sec, rest 30 sec"]],
+      ["Kettlebell Flow", "Intermediate", "28 min", "Move smoothly through kettlebell patterns.", ["Kettlebell Clean 4x6 each, rest 45 sec", "Kettlebell Press 4x6 each, rest 45 sec", "Kettlebell Swing 4x15, rest 45 sec", "Goblet Squat 4x10, rest 45 sec"]],
+      ["Dumbbell Complex", "Advanced", "25 min", "Use one pair of dumbbells for hard work.", ["5 rounds", "6 Dumbbell Deadlifts", "6 Dumbbell Cleans", "6 Dumbbell Front Squats", "6 Dumbbell Push Press, rest 90 sec"]],
+      ["Sandbag Workout", "Intermediate", "32 min", "Train odd-object strength.", ["Sandbag Clean 5x5, rest 60 sec", "Sandbag Carry 5x40m, rest 60 sec", "Sandbag Squat 4x10, rest 60 sec", "Burpees 4x10, rest 60 sec"]],
+      ["Full Body Functional", "Intermediate", "36 min", "Blend carries, hinges, pushes, and squats.", ["Kettlebell Swing 4x15, rest 45 sec", "Farmer Carry 4x40m, rest 60 sec", "Dumbbell Thruster 4x10, rest 60 sec", "Row 4x250m, rest 60 sec"]],
+      ["Grip Strength", "Beginner", "28 min", "Build grip and forearm endurance.", ["Dead Hang 5x30 sec, rest 45 sec", "Farmer Carry 5x30m, rest 60 sec", "Plate Pinch 4x30 sec, rest 45 sec", "Wrist Curl 3x15, rest 45 sec"]],
+      ["Odd Object Carry", "Intermediate", "30 min", "Carry awkward loads with strong posture.", ["Sandbag Carry 6x30m, rest 60 sec", "Bear Hug Carry 5x30m, rest 60 sec", "Suitcase Carry 4x30m each, rest 60 sec", "Goblet Squat 3x12, rest 60 sec"]],
+      ["Athletic Circuit", "Intermediate", "30 min", "Move through functional athletic patterns.", ["4 rounds", "Sled Push 20m", "Dumbbell Snatch 10 each", "Box Step-Ups 12 each", "Battle Ropes 30 sec, rest 75 sec"]],
+      ["Work Capacity Day", "Advanced", "40 min", "Build the ability to keep working.", ["AMRAP 30 min", "500m Row", "20 Kettlebell Swings", "15 Push-Ups", "Farmer Carry 40m"]]
+    ])
   ];
+  const workoutDatabase = buildWorkoutDatabase();
 
   const libraryTabs = ["All", "Favorites", "Recent", "Strength", "Cardio", "Benchmarks"];
   const categoryIconText = {
@@ -161,10 +314,14 @@
   ];
 
   const defaultState = {
-    version: 5,
+    version: 6,
     settings: {
       darkMode: false,
       units: "lb"
+    },
+    profile: {
+      name: "",
+      bodyWeight: ""
     },
     movements: [
       {
@@ -195,11 +352,12 @@
     workouts: [],
     workoutFavorites: [],
     workoutHistory: [],
+    todayWorkout: null,
     logs: []
   };
 
   let state = loadState();
-  let activeView = "track";
+  let activeView = "today";
   let chartPoints = [];
   let toastTimer = null;
   let activeCategoryFilter = "All";
@@ -208,6 +366,8 @@
   let activeWorkoutCategory = "All";
   let activeWorkoutDifficulty = "All";
   let activeDatabaseWorkoutId = null;
+  let selectingWorkoutForToday = false;
+  let todayBuilderExercises = [];
   let workoutTimer = {
     kind: null,
     startedAt: null,
@@ -233,21 +393,28 @@
   function cacheElements() {
     [
       "totalSessions", "thisWeekSessions", "trackedMovements", "quickAddMovement",
+      "todayPicker", "chooseWorkoutDatabase", "createCustomTodayWorkout", "todayCustomBuilder",
+      "todayWorkoutName", "todayWorkoutCategory", "todayExerciseSelect", "todayExerciseNotes", "addTodayExercise",
+      "todayExerciseRounds", "todayExerciseSets", "todayExerciseReps", "todayExerciseTime", "todayExerciseWeight", "todayExerciseRest",
+      "todayBuilderList", "saveTodayCustomWorkout", "cancelTodayCustomWorkout", "todayActiveWorkout",
       "quickExerciseButtons", "logMovementSelect", "logForm",
       "logDate", "logFields", "autofillSuggestions", "logEffort", "effortValue",
       "logNotes", "duplicateLastWorkout", "recentResults", "progressMovementSelect",
       "progressBest", "progressPreviousBest", "progressTrend", "progressChart",
       "chartTooltip", "movementHistory", "movementForm", "movementId",
       "movementName", "movementCategory", "movementPrimaryMetric", "movementFavorite",
-      "cancelMovementEdit", "benchmarkButtons", "workoutBuilderDetails", "workoutForm", "workoutId", "workoutName",
-      "workoutFormat", "workoutRounds", "workoutMovements", "cancelWorkoutEdit", "workoutList",
-      "databaseWorkoutDetail", "workoutBrowse", "workoutSearch", "workoutDifficultyFilters",
+      "cancelMovementEdit", "benchmarkButtons", "workoutBuilderDetails", "workoutForm", "workoutId", "workoutName", "workoutCategory",
+      "workoutFormat", "workoutRounds", "workoutMovements", "workoutMovementSelect", "workoutMoveRounds", "workoutMoveSets", "workoutMoveReps",
+      "workoutMoveTime", "workoutMoveWeight", "workoutMoveRest", "addWorkoutMovement", "cancelWorkoutEdit", "workoutList",
+      "databaseWorkoutDetail", "workoutBrowse", "closeWorkoutBrowse", "workoutSearch", "workoutDifficultyFilters",
       "workoutCategoryFilters", "favoriteWorkoutChips", "recentWorkoutChips", "databaseWorkoutList",
-      "movementList", "darkModeToggle", "unitSelect", "exportData",
+      "movementList", "profileName", "profileBodyWeight", "darkModeToggle", "unitSelect", "exportData",
       "importData", "clearData", "stickySaveResult", "toast", "openMovementPicker",
       "movementPicker", "closeMovementPicker", "pickerSearch", "pickerFavorites",
       "pickerRecent", "pickerMostUsed", "pickerResults", "movementSearch", "categoryFilters",
-      "libraryTabs", "pickerTabs", "libraryMostUsed"
+      "libraryTabs", "pickerTabs", "libraryMostUsed", "statTotalWorkouts", "statTotalExercises",
+      "statTotalPrs", "statCurrentStreak", "statLongestStreak", "statFavoriteExercise",
+      "statTopCategory", "statFirstWorkoutDate"
     ].forEach((id) => {
       els[id] = document.getElementById(id);
     });
@@ -259,10 +426,43 @@
     });
 
     els.quickAddMovement.addEventListener("click", () => {
-      setView("movements");
+      setView("add");
       resetMovementForm();
       els.movementName.focus();
     });
+
+    els.chooseWorkoutDatabase.addEventListener("click", () => {
+      selectingWorkoutForToday = true;
+      activeDatabaseWorkoutId = null;
+      els.workoutBrowse.hidden = false;
+      els.databaseWorkoutDetail.hidden = true;
+      renderWorkoutDatabase();
+      els.workoutSearch.focus();
+      els.workoutBrowse.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast("Choose a workout for today");
+    });
+
+    els.closeWorkoutBrowse.addEventListener("click", () => {
+      selectingWorkoutForToday = false;
+      activeDatabaseWorkoutId = null;
+      els.workoutBrowse.hidden = true;
+      els.databaseWorkoutDetail.hidden = true;
+      showToast("Workout database closed");
+    });
+
+    els.createCustomTodayWorkout.addEventListener("click", () => {
+      selectingWorkoutForToday = false;
+      els.workoutBrowse.hidden = true;
+      els.databaseWorkoutDetail.hidden = true;
+      els.todayCustomBuilder.hidden = false;
+      els.todayPicker.hidden = true;
+      renderTodayBuilderList();
+      els.todayWorkoutName.focus();
+    });
+
+    els.addTodayExercise.addEventListener("click", addTodayBuilderExercise);
+    els.saveTodayCustomWorkout.addEventListener("click", saveCustomTodayWorkout);
+    els.cancelTodayCustomWorkout.addEventListener("click", cancelCustomTodayWorkout);
 
     els.logMovementSelect.addEventListener("change", () => {
       renderLogFields(true);
@@ -307,6 +507,7 @@
       saveWorkout();
     });
 
+    els.addWorkoutMovement.addEventListener("click", addWorkoutMovementLine);
     els.cancelWorkoutEdit.addEventListener("click", resetWorkoutForm);
 
     els.darkModeToggle.addEventListener("change", () => {
@@ -319,6 +520,14 @@
       state.settings.units = els.unitSelect.value;
       saveState();
       renderAll();
+    });
+
+    [els.profileName, els.profileBodyWeight].forEach((input) => {
+      input.addEventListener("input", () => {
+        state.profile.name = els.profileName.value.trim();
+        state.profile.bodyWeight = els.profileBodyWeight.value.trim();
+        saveState();
+      });
     });
 
     els.exportData.addEventListener("click", exportBackup);
@@ -334,8 +543,12 @@
   }
 
   function renderAll() {
+    ensureTodayWorkoutDate();
     renderSummary();
     renderMovementSelects();
+    renderTodayExerciseSelect();
+    renderWorkoutCategorySelects();
+    renderToday();
     renderQuickButtons();
     renderLogFields(false);
     renderAutofillSuggestions();
@@ -363,7 +576,7 @@
     });
     els.stickySaveResult.hidden = view !== "track";
     if (view === "progress") renderProgress();
-    if (view === "workouts") renderWorkoutDatabase();
+    if (view === "today") renderWorkoutDatabase();
   }
 
   function renderSummary() {
@@ -372,6 +585,80 @@
     els.totalSessions.textContent = logs.length + completedWorkouts.length;
     els.thisWeekSessions.textContent = logs.filter((log) => isThisWeek(log.date)).length + completedWorkouts.filter((entry) => isThisWeek(entry.date)).length;
     els.trackedMovements.textContent = state.movements.length;
+  }
+
+  function renderTodayExerciseSelect() {
+    const options = sortMovements(state.movements)
+      .map((movement) => `<option value="${movement.id}">${escapeHtml(movement.name)}</option>`)
+      .join("");
+    [els.todayExerciseSelect, els.workoutMovementSelect].forEach((select) => {
+      if (!select) return;
+      const previous = select.value;
+      select.innerHTML = options;
+      if (getMovement(previous)) select.value = previous;
+    });
+  }
+
+  function renderWorkoutCategorySelects() {
+    const categories = workoutCategories.filter((category) => !["All", "Favorites", "Recent"].includes(category));
+    const options = categories.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("");
+    [els.todayWorkoutCategory, els.workoutCategory].forEach((select) => {
+      if (!select) return;
+      const previous = select.value;
+      select.innerHTML = options;
+      select.value = categories.includes(previous) ? previous : "General Strength";
+    });
+  }
+
+  function renderToday() {
+    const todayWorkout = getTodayWorkout();
+    els.todayCustomBuilder.hidden = true;
+    els.todayPicker.hidden = Boolean(todayWorkout);
+    els.todayActiveWorkout.hidden = !todayWorkout;
+    if (!selectingWorkoutForToday) {
+      els.workoutBrowse.hidden = true;
+      els.databaseWorkoutDetail.hidden = true;
+    }
+
+    if (!todayWorkout) {
+      renderTodayBuilderList();
+      return;
+    }
+
+    els.todayActiveWorkout.innerHTML = `
+      <div class="section-heading compact">
+        <div>
+          <h2>${escapeHtml(todayWorkout.name)}</h2>
+          <p>${escapeHtml(todayWorkout.category || "Custom")} ${todayWorkout.difficulty ? `&middot; ${escapeHtml(todayWorkout.difficulty)}` : ""} ${todayWorkout.duration ? `&middot; ${escapeHtml(todayWorkout.duration)}` : ""} ${todayWorkout.equipment ? `&middot; ${escapeHtml(todayWorkout.equipment)}` : ""}</p>
+        </div>
+      </div>
+      ${todayWorkout.goal ? `<p class="workout-note"><strong>Goal:</strong> ${escapeHtml(todayWorkout.goal)}</p>` : ""}
+      <div class="today-workout-actions">
+        <button class="primary-button" type="button" data-action="today-start">Start Workout</button>
+        <button class="secondary-button" type="button" data-action="today-clear">Clear/Change Workout</button>
+      </div>
+      <div class="workout-exercise-list">
+        ${todayWorkout.exercises.map((exercise, index) => `
+          <label class="today-exercise-row">
+            <input type="checkbox" data-today-check="${index}" ${todayWorkout.checked?.includes(index) ? "checked" : ""}>
+            <span>
+              <strong>${escapeHtml(exercise.name)}</strong>
+              <small>${escapeHtml(exercise.prescription || "")}</small>
+            </span>
+            <textarea data-today-result="${index}" rows="2" placeholder="Notes/results">${escapeHtml(todayWorkout.results?.[index] || "")}</textarea>
+          </label>
+        `).join("")}
+      </div>
+      <button class="primary-button" type="button" data-action="today-finish">Finish Workout</button>
+    `;
+
+    els.todayActiveWorkout.querySelector("[data-action='today-start']").addEventListener("click", startWorkoutTimer);
+    els.todayActiveWorkout.querySelector("[data-action='today-clear']").addEventListener("click", clearTodayWorkout);
+    els.todayActiveWorkout.querySelector("[data-action='today-finish']").addEventListener("click", finishTodayWorkout);
+    els.todayActiveWorkout.querySelectorAll("[data-today-check], [data-today-result]").forEach((field) => {
+      field.addEventListener("change", saveTodayProgress);
+      field.addEventListener("input", saveTodayProgress);
+    });
   }
 
   function renderMovementSelects() {
@@ -593,7 +880,10 @@
 
   function renderWorkoutShortcutChips() {
     const favorites = state.workoutFavorites.map(getDatabaseWorkout).filter(Boolean).slice(0, 10);
-    const recentIds = [...new Set(state.workoutHistory.slice().sort((a, b) => b.completedAt - a.completedAt).map((entry) => entry.workoutId))];
+    const recentIds = [...new Set(state.workoutHistory
+      .filter((entry) => isThisWeek(entry.date))
+      .sort((a, b) => b.completedAt - a.completedAt)
+      .map((entry) => entry.workoutId))];
     const recent = recentIds.map(getDatabaseWorkout).filter(Boolean).slice(0, 10);
 
     els.favoriteWorkoutChips.innerHTML = favorites.length
@@ -601,7 +891,7 @@
       : '<p class="empty-state">Favorite workouts appear here.</p>';
     els.recentWorkoutChips.innerHTML = recent.length
       ? recent.map((workout) => workoutChip(workout)).join("")
-      : '<p class="empty-state">Completed workouts appear here.</p>';
+      : '<p class="empty-state">Workouts completed this week appear here.</p>';
 
     [els.favoriteWorkoutChips, els.recentWorkoutChips].forEach((container) => {
       container.querySelectorAll("[data-database-workout]").forEach((button) => {
@@ -620,12 +910,13 @@
     els.databaseWorkoutList.innerHTML = workouts.map((workout) => {
       const completed = state.workoutHistory.filter((entry) => entry.workoutId === workout.id).length;
       const isFavorite = state.workoutFavorites.includes(workout.id);
+      const sourceLabel = workout.source === "custom" ? "Custom" : workout.difficulty;
       return `
         <article class="database-workout-card">
           <button type="button" class="database-workout-main" data-open-workout="${workout.id}">
-            <span class="category-badge ${difficultyClass(workout.difficulty)}">${escapeHtml(workout.difficulty)}</span>
+            <span class="category-badge ${difficultyClass(workout.difficulty)}">${escapeHtml(sourceLabel)}</span>
             <strong>${escapeHtml(workout.name)}</strong>
-            <span>${escapeHtml(workout.category)} &middot; ${escapeHtml(workout.duration)} &middot; ${completed} completed</span>
+            <span>${escapeHtml(workout.category)} &middot; ${escapeHtml(workout.duration)} &middot; ${escapeHtml(workout.equipment || "No equipment")} &middot; ${completed} completed</span>
           </button>
           <button class="favorite-button ${isFavorite ? "is-on" : ""}" type="button" data-favorite-workout="${workout.id}" aria-label="Favorite workout">${isFavorite ? "Pin" : "+"}</button>
         </article>
@@ -644,7 +935,7 @@
     const workout = getDatabaseWorkout(activeDatabaseWorkoutId);
     if (!workout) {
       els.databaseWorkoutDetail.hidden = true;
-      els.workoutBrowse.hidden = false;
+      els.workoutBrowse.hidden = !selectingWorkoutForToday;
       stopWorkoutTimer();
       return;
     }
@@ -661,8 +952,12 @@
           <p>${escapeHtml(workout.category)} &middot; ${escapeHtml(workout.difficulty)} &middot; ${escapeHtml(workout.duration)} &middot; ${completed} completed</p>
         </div>
       </div>
+      ${workout.goal ? `<p class="workout-note"><strong>Goal:</strong> ${escapeHtml(workout.goal)}</p>` : ""}
+      ${workout.equipment ? `<p class="workout-note"><strong>Equipment:</strong> ${escapeHtml(workout.equipment)}</p>` : ""}
       ${workout.notes ? `<p class="workout-note">${escapeHtml(workout.notes)}</p>` : ""}
+      ${workout.tags?.length ? `<div class="card-badge-row">${workout.tags.map((tag) => `<span class="standard-badge">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
       <div class="workout-detail-actions">
+        <button class="primary-button" type="button" data-action="use-today">Set as Today's Workout</button>
         <button class="primary-button" type="button" data-action="start-workout">Start Workout</button>
         <button class="secondary-button" type="button" data-action="rest-timer">Rest 60s</button>
         <button class="secondary-button" type="button" data-action="favorite-workout">${isFavorite ? "Unfavorite" : "Favorite"}</button>
@@ -687,6 +982,7 @@
     `;
 
     els.databaseWorkoutDetail.querySelector("[data-action='back-workouts']").addEventListener("click", closeDatabaseWorkout);
+    els.databaseWorkoutDetail.querySelector("[data-action='use-today']").addEventListener("click", () => setDatabaseWorkoutForToday(workout.id));
     els.databaseWorkoutDetail.querySelector("[data-action='start-workout']").addEventListener("click", startWorkoutTimer);
     els.databaseWorkoutDetail.querySelector("[data-action='rest-timer']").addEventListener("click", () => startRestTimer(60));
     els.databaseWorkoutDetail.querySelector("[data-action='favorite-workout']").addEventListener("click", () => toggleDatabaseWorkoutFavorite(workout.id));
@@ -695,6 +991,10 @@
   }
 
   function openDatabaseWorkout(id) {
+    if (selectingWorkoutForToday) {
+      setDatabaseWorkoutForToday(id);
+      return;
+    }
     activeDatabaseWorkoutId = id;
     stopWorkoutTimer();
     renderWorkoutDatabase();
@@ -707,9 +1007,201 @@
     renderWorkoutDatabase();
   }
 
+  function setDatabaseWorkoutForToday(id) {
+    const workout = getDatabaseWorkout(id);
+    if (!workout) return;
+    state.todayWorkout = {
+      date: localDate(),
+      source: "database",
+      workoutId: workout.id,
+      name: workout.name,
+      category: workout.category,
+      difficulty: workout.difficulty,
+      duration: workout.duration,
+      equipment: workout.equipment || "",
+      goal: workout.goal || "",
+      notes: workout.notes || "",
+      tags: Array.isArray(workout.tags) ? [...workout.tags] : [],
+      exercises: workout.exercises.map((exercise) => ({ ...exercise })),
+      checked: [],
+      results: {},
+      startedAt: null
+    };
+    selectingWorkoutForToday = false;
+    activeDatabaseWorkoutId = null;
+    els.workoutBrowse.hidden = true;
+    els.databaseWorkoutDetail.hidden = true;
+    saveState();
+    renderAll();
+    setView("today");
+    showToast("Today's workout is set");
+  }
+
+  function addTodayBuilderExercise() {
+    const movement = getMovement(els.todayExerciseSelect.value);
+    if (!movement) return;
+    const prescription = buildExercisePrescription("todayExercise", formatMetricNames(movement));
+    todayBuilderExercises.push({
+      name: movement.name,
+      prescription
+    });
+    clearExercisePrescriptionFields("todayExercise");
+    renderTodayBuilderList();
+  }
+
+  function addWorkoutMovementLine() {
+    const movement = getMovement(els.workoutMovementSelect.value);
+    if (!movement) return;
+    const prescription = buildExercisePrescription("workoutMove", "");
+    const line = `${movement.name}${prescription ? `, ${prescription}` : ""}`;
+    const current = els.workoutMovements.value.trim();
+    els.workoutMovements.value = current ? `${current}\n${line}` : line;
+    clearExercisePrescriptionFields("workoutMove");
+    showToast("Movement added");
+  }
+
+  function renderTodayBuilderList() {
+    if (!els.todayBuilderList) return;
+    els.todayBuilderList.innerHTML = todayBuilderExercises.length
+      ? todayBuilderExercises.map((exercise, index) => `
+        <article class="today-builder-item">
+          <span><strong>${escapeHtml(exercise.name)}</strong><small>${escapeHtml(exercise.prescription)}</small></span>
+          <button type="button" data-remove-today-exercise="${index}">Remove</button>
+        </article>
+      `).join("")
+      : '<p class="empty-state">Add exercises from the library to build today\'s workout.</p>';
+
+    els.todayBuilderList.querySelectorAll("[data-remove-today-exercise]").forEach((button) => {
+      button.addEventListener("click", () => {
+        todayBuilderExercises.splice(Number(button.dataset.removeTodayExercise), 1);
+        renderTodayBuilderList();
+      });
+    });
+  }
+
+  function saveCustomTodayWorkout() {
+    const name = els.todayWorkoutName.value.trim();
+    if (!name || !todayBuilderExercises.length) {
+      alert("Add a workout name and at least one exercise.");
+      return;
+    }
+
+    const category = els.todayWorkoutCategory.value || "General Strength";
+    const savedWorkoutId = makeId();
+    const savedWorkout = {
+      id: savedWorkoutId,
+      name,
+      category,
+      format: "custom",
+      rounds: "",
+      movements: todayBuilderExercises.map((exercise) => `${exercise.name}${exercise.prescription ? `, ${exercise.prescription}` : ""}`),
+      duration: "Custom",
+      equipment: "Custom",
+      goal: "Complete your custom workout.",
+      notes: "Created from the Today tab.",
+      tags: ["custom", normalizeName(category)].filter(Boolean),
+      createdAt: Date.now()
+    };
+
+    state.todayWorkout = {
+      date: localDate(),
+      source: "custom",
+      workoutId: customDatabaseWorkoutId(savedWorkoutId),
+      name,
+      category,
+      difficulty: "",
+      duration: "",
+      equipment: "",
+      goal: "",
+      notes: "",
+      tags: ["custom"],
+      exercises: todayBuilderExercises.map((exercise) => ({ ...exercise })),
+      checked: [],
+      results: {},
+      startedAt: null
+    };
+    state.workouts.push(savedWorkout);
+    todayBuilderExercises = [];
+    els.todayWorkoutName.value = "";
+    els.todayExerciseNotes.value = "";
+    clearExercisePrescriptionFields("todayExercise");
+    saveState();
+    renderAll();
+    showToast("Today's workout is set");
+  }
+
+  function cancelCustomTodayWorkout() {
+    todayBuilderExercises = [];
+    els.todayWorkoutName.value = "";
+    els.todayExerciseNotes.value = "";
+    clearExercisePrescriptionFields("todayExercise");
+    selectingWorkoutForToday = false;
+    els.workoutBrowse.hidden = true;
+    els.databaseWorkoutDetail.hidden = true;
+    els.todayCustomBuilder.hidden = true;
+    els.todayPicker.hidden = false;
+    renderTodayBuilderList();
+  }
+
+  function getTodayWorkout() {
+    return state.todayWorkout?.date === localDate() ? state.todayWorkout : null;
+  }
+
+  function ensureTodayWorkoutDate() {
+    if (state.todayWorkout && state.todayWorkout.date !== localDate()) {
+      state.todayWorkout = null;
+      saveState();
+    }
+  }
+
+  function saveTodayProgress() {
+    const todayWorkout = getTodayWorkout();
+    if (!todayWorkout) return;
+    todayWorkout.checked = Array.from(els.todayActiveWorkout.querySelectorAll("[data-today-check]"))
+      .filter((input) => input.checked)
+      .map((input) => Number(input.dataset.todayCheck));
+    todayWorkout.results = {};
+    els.todayActiveWorkout.querySelectorAll("[data-today-result]").forEach((field) => {
+      if (field.value.trim()) todayWorkout.results[field.dataset.todayResult] = field.value.trim();
+    });
+    saveState();
+  }
+
+  function clearTodayWorkout() {
+    if (!confirm("Clear today's workout and choose another?")) return;
+    state.todayWorkout = null;
+    stopWorkoutTimer();
+    saveState();
+    renderAll();
+  }
+
+  function finishTodayWorkout() {
+    const todayWorkout = getTodayWorkout();
+    if (!todayWorkout) return;
+    saveTodayProgress();
+    state.workoutHistory.push({
+      id: makeId(),
+      workoutId: todayWorkout.workoutId || `custom-${makeId()}`,
+      workoutName: todayWorkout.name,
+      source: todayWorkout.source,
+      completedAt: Date.now(),
+      date: localDate(),
+      checked: todayWorkout.checked || [],
+      results: todayWorkout.results || {},
+      result: Object.values(todayWorkout.results || {}).filter(Boolean).join(" | "),
+      elapsedSeconds: todayWorkout.startedAt ? Math.max(0, Math.floor((Date.now() - todayWorkout.startedAt) / 1000)) : null,
+      workoutSnapshot: todayWorkout
+    });
+    state.todayWorkout = null;
+    stopWorkoutTimer();
+    saveState();
+    renderAll();
+    showToast("Workout completed!");
+  }
+
   function getFilteredDatabaseWorkouts() {
     const query = normalizeName(els.workoutSearch.value);
-    return workoutDatabase
+    return getAvailableDatabaseWorkouts()
       .filter((workout) => {
         if (activeWorkoutCategory === "Favorites") return state.workoutFavorites.includes(workout.id);
         if (activeWorkoutCategory === "Recent") return state.workoutHistory.some((entry) => entry.workoutId === workout.id);
@@ -724,6 +1216,38 @@
         if (aFav !== bFav) return aFav ? -1 : 1;
         return a.name.localeCompare(b.name);
       });
+  }
+
+  function getAvailableDatabaseWorkouts() {
+    return [...workoutDatabase, ...state.workouts.map(customWorkoutToDatabaseWorkout)];
+  }
+
+  function customWorkoutToDatabaseWorkout(workout) {
+    return {
+      id: customDatabaseWorkoutId(workout.id),
+      source: "custom",
+      name: workout.name || "Custom Workout",
+      category: workout.category || "General Strength",
+      difficulty: workout.difficulty || "Beginner",
+      duration: workout.duration || workout.rounds || "Custom",
+      equipment: workout.equipment || "Custom",
+      goal: workout.goal || "Complete your saved custom workout.",
+      notes: workout.notes || "Custom workout saved on this device.",
+      tags: Array.from(new Set(["custom", normalizeName(workout.category || "General Strength"), ...(workout.tags || [])].filter(Boolean))),
+      exercises: (workout.movements || []).map(customWorkoutLineToExercise)
+    };
+  }
+
+  function customWorkoutLineToExercise(line) {
+    const parts = String(line || "").split(",");
+    return {
+      name: parts.shift().trim() || "Exercise",
+      prescription: parts.join(",").trim() || "Complete as written"
+    };
+  }
+
+  function customDatabaseWorkoutId(id) {
+    return `custom-${id}`;
   }
 
   function toggleDatabaseWorkoutFavorite(id) {
@@ -761,15 +1285,20 @@
     stopWorkoutTimer();
     activeDatabaseWorkoutId = null;
     renderAll();
-    setView("workouts");
+    setView("today");
     showToast("Workout complete!");
   }
 
   function startWorkoutTimer() {
     stopWorkoutTimer();
+    const todayWorkout = getTodayWorkout();
+    if (activeView === "today" && todayWorkout && !todayWorkout.startedAt) {
+      todayWorkout.startedAt = Date.now();
+      saveState();
+    }
     workoutTimer = {
       kind: "workout",
-      startedAt: Date.now(),
+      startedAt: todayWorkout?.startedAt || Date.now(),
       duration: 0,
       intervalId: window.setInterval(updateWorkoutTimerDisplay, 1000)
     };
@@ -958,7 +1487,7 @@
       card.innerHTML = `
         <div>
           <h3>${escapeHtml(workout.name)}</h3>
-          <p>${escapeHtml(workoutSummary(workout))}</p>
+          <p>${escapeHtml(workout.category || "General Strength")} &middot; ${escapeHtml(workoutSummary(workout))}</p>
           <ol>${workout.movements.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ol>
           <p>${logs.length} logged${Number.isFinite(best) ? ` &middot; Best ${escapeHtml(formatWorkoutResult(workout, best))}` : ""}</p>
         </div>
@@ -1073,8 +1602,87 @@
   }
 
   function renderSettings() {
+    const stats = calculateSettingsStats();
+    els.profileName.value = state.profile.name || "";
+    els.profileBodyWeight.value = state.profile.bodyWeight || "";
     els.darkModeToggle.checked = state.settings.darkMode;
     els.unitSelect.value = state.settings.units;
+    els.statTotalWorkouts.textContent = stats.totalWorkouts;
+    els.statTotalExercises.textContent = stats.totalExercises;
+    els.statTotalPrs.textContent = stats.totalPrs;
+    els.statCurrentStreak.textContent = `${stats.currentStreak} day${stats.currentStreak === 1 ? "" : "s"}`;
+    els.statLongestStreak.textContent = `${stats.longestStreak} day${stats.longestStreak === 1 ? "" : "s"}`;
+    els.statFavoriteExercise.textContent = stats.favoriteExercise;
+    els.statTopCategory.textContent = stats.topCategory;
+    els.statFirstWorkoutDate.textContent = stats.firstDate;
+  }
+
+  function calculateSettingsStats() {
+    const logs = activeLogs();
+    const workoutHistory = state.workoutHistory || [];
+    const datedEntries = [
+      ...logs.map((log) => log.date).filter(Boolean),
+      ...workoutHistory.map((entry) => entry.date).filter(Boolean)
+    ];
+    return {
+      totalWorkouts: workoutHistory.length + logs.filter((log) => log.workoutId).length,
+      totalExercises: logs.length,
+      totalPrs: logs.filter((log) => log.pr).length,
+      currentStreak: workoutStreak(datedEntries).current,
+      longestStreak: workoutStreak(datedEntries).longest,
+      favoriteExercise: favoriteExerciseName(logs),
+      topCategory: mostUsedWorkoutCategory(workoutHistory),
+      firstDate: datedEntries.length ? formatDate(datedEntries.sort()[0]) : "--"
+    };
+  }
+
+  function workoutStreak(dates) {
+    const unique = [...new Set(dates)].sort();
+    if (!unique.length) return { current: 0, longest: 0 };
+    let longest = 1;
+    let run = 1;
+    for (let index = 1; index < unique.length; index += 1) {
+      const previous = new Date(`${unique[index - 1]}T00:00:00`);
+      const current = new Date(`${unique[index]}T00:00:00`);
+      const dayGap = Math.round((current - previous) / 86400000);
+      run = dayGap === 1 ? run + 1 : 1;
+      longest = Math.max(longest, run);
+    }
+    const today = localDate();
+    const yesterday = offsetDate(-1);
+    let currentStreak = 0;
+    if (unique.includes(today) || unique.includes(yesterday)) {
+      let cursor = unique.includes(today) ? today : yesterday;
+      while (unique.includes(cursor)) {
+        currentStreak += 1;
+        cursor = offsetDate(-currentStreak, unique.includes(today) ? today : yesterday);
+      }
+    }
+    return { current: currentStreak, longest };
+  }
+
+  function favoriteExerciseName(logs) {
+    const counts = new Map();
+    logs.forEach((log) => counts.set(log.movementId, (counts.get(log.movementId) || 0) + 1));
+    const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    return top ? getMovement(top[0])?.name || "--" : "--";
+  }
+
+  function mostUsedWorkoutCategory(history) {
+    const counts = new Map();
+    history.forEach((entry) => {
+      const category = entry.workoutSnapshot?.category || getDatabaseWorkout(entry.workoutId)?.category || "Custom";
+      counts.set(category, (counts.get(category) || 0) + 1);
+    });
+    const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    return top ? top[0] : "--";
+  }
+
+  function offsetDate(days, from = localDate()) {
+    const date = new Date(`${from}T00:00:00`);
+    date.setDate(date.getDate() + days);
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 10);
   }
 
   function saveLog() {
@@ -1150,21 +1758,16 @@
   }
 
   function saveMovement() {
-    const selectedMetrics = Array.from(document.querySelectorAll('input[name="metric"]:checked'))
-      .map((input) => input.value);
-
-    if (!selectedMetrics.length) {
-      alert("Choose at least one field to track for this exercise.");
-      return;
-    }
+    const category = els.movementCategory.value || "Strength";
+    const tracking = defaultTrackingForCategory(category);
 
     const movement = {
       id: els.movementId.value || makeId(),
       name: els.movementName.value.trim(),
-      category: els.movementCategory.value.trim(),
-      primaryMetric: els.movementPrimaryMetric.value,
-      metrics: selectedMetrics,
-      favorite: els.movementFavorite.checked
+      category,
+      primaryMetric: tracking.primaryMetric,
+      metrics: tracking.metrics,
+      favorite: false
     };
 
     if (!movement.name) return;
@@ -1184,6 +1787,14 @@
     showToast("Exercise saved");
   }
 
+  function defaultTrackingForCategory(category) {
+    if (["Cardio", "Conditioning"].includes(category)) return { metrics: ["time", "distance"], primaryMetric: "time" };
+    if (["Bodyweight", "Core"].includes(category)) return { metrics: ["sets", "reps"], primaryMetric: "reps" };
+    if (["Mobility", "Benchmark"].includes(category)) return { metrics: ["time"], primaryMetric: "time" };
+    if (["Plyometrics", "Sports Performance"].includes(category)) return { metrics: ["reps", "distance"], primaryMetric: "distance" };
+    return { metrics: ["sets", "reps", "weight"], primaryMetric: "estimatedMax" };
+  }
+
   function saveWorkout() {
     const movements = els.workoutMovements.value
       .split(/\r?\n/)
@@ -1198,9 +1809,15 @@
     const workout = {
       id: els.workoutId.value || makeId(),
       name: els.workoutName.value.trim(),
+      category: els.workoutCategory.value || "General Strength",
       format: els.workoutFormat.value,
       rounds: els.workoutRounds.value.trim(),
       movements,
+      duration: els.workoutRounds.value.trim() || "Custom",
+      equipment: "Custom",
+      goal: "Complete your saved custom workout.",
+      notes: "Custom workout saved on this device.",
+      tags: ["custom", normalizeName(els.workoutCategory.value || "General Strength")].filter(Boolean),
       createdAt: Date.now()
     };
 
@@ -1215,6 +1832,42 @@
     resetWorkoutForm();
     renderAll();
     showToast("Workout saved");
+  }
+
+  function buildExercisePrescription(prefix, fallback) {
+    const rounds = valueFor(`${prefix}Rounds`);
+    const sets = valueFor(`${prefix}Sets`);
+    const reps = valueFor(`${prefix}Reps`);
+    const time = valueFor(`${prefix}Time`);
+    const weight = valueFor(`${prefix}Weight`);
+    const rest = valueFor(`${prefix}Rest`);
+    const notes = prefix === "todayExercise" ? els.todayExerciseNotes.value.trim() : "";
+    const parts = [];
+
+    if (rounds) parts.push(`${rounds} round${rounds === "1" ? "" : "s"}`);
+    if (sets && reps) {
+      parts.push(`${sets}x${reps}`);
+    } else {
+      if (sets) parts.push(`${sets} set${sets === "1" ? "" : "s"}`);
+      if (reps) parts.push(`${reps} rep${reps === "1" ? "" : "s"}`);
+    }
+    if (time) parts.push(time);
+    if (weight) parts.push(weight);
+    if (rest) parts.push(`rest ${rest}`);
+    if (notes) parts.push(notes);
+
+    return parts.join(", ") || fallback || "Complete with quality reps";
+  }
+
+  function valueFor(id) {
+    return String(els[id]?.value || "").trim();
+  }
+
+  function clearExercisePrescriptionFields(prefix) {
+    ["Rounds", "Sets", "Reps", "Time", "Weight", "Rest"].forEach((suffix) => {
+      if (els[`${prefix}${suffix}`]) els[`${prefix}${suffix}`].value = "";
+    });
+    if (prefix === "todayExercise") els.todayExerciseNotes.value = "";
   }
 
   function toggleFavorite(id) {
@@ -1245,6 +1898,7 @@
   function resetMovementForm() {
     els.movementId.value = "";
     els.movementForm.reset();
+    els.movementCategory.value = "Strength";
     ["sets", "reps", "weight"].forEach((metric) => {
       const input = document.querySelector(`input[name="metric"][value="${metric}"]`);
       if (input) input.checked = true;
@@ -1276,6 +1930,7 @@
 
     els.workoutId.value = workout.id;
     els.workoutName.value = workout.name;
+    els.workoutCategory.value = workout.category || "General Strength";
     els.workoutFormat.value = workout.format || "time";
     els.workoutRounds.value = workout.rounds || "";
     els.workoutMovements.value = (workout.movements || []).join("\n");
@@ -1286,7 +1941,9 @@
   function resetWorkoutForm() {
     els.workoutId.value = "";
     els.workoutForm.reset();
+    els.workoutCategory.value = "General Strength";
     els.workoutFormat.value = "time";
+    clearExercisePrescriptionFields("workoutMove");
     els.workoutBuilderDetails.open = false;
   }
 
@@ -1360,7 +2017,7 @@
     state.movements.push(movement);
     saveState();
     renderAll();
-    setView("track");
+        setView("track");
     selectMovement(movement.id);
     showToast(`${name} added to exercises`);
   }
@@ -1757,7 +2414,7 @@
   }
 
   function searchableDatabaseWorkoutText(workout) {
-    return normalizeName(`${workout.name} ${workout.category} ${workout.difficulty} ${workout.duration} ${workout.notes || ""} ${workout.exercises.map((exercise) => `${exercise.name} ${exercise.prescription}`).join(" ")}`);
+    return normalizeName(`${workout.name} ${workout.category} ${workout.difficulty} ${workout.duration} ${workout.equipment || ""} ${workout.goal || ""} ${workout.notes || ""} ${(workout.tags || []).join(" ")} ${workout.exercises.map((exercise) => `${exercise.name} ${exercise.prescription}`).join(" ")}`);
   }
 
   function difficultyClass(difficulty) {
@@ -2053,7 +2710,7 @@
   }
 
   function getDatabaseWorkout(id) {
-    return workoutDatabase.find((workout) => workout.id === id);
+    return getAvailableDatabaseWorkouts().find((workout) => workout.id === id);
   }
 
   function loadState() {
@@ -2082,10 +2739,14 @@
     if (!input || !Array.isArray(input.movements) || !Array.isArray(input.logs)) return base;
 
     return {
-      version: 5,
+      version: 6,
       settings: {
         darkMode: Boolean(input.settings?.darkMode),
         units: input.settings?.units === "kg" ? "kg" : "lb"
+      },
+      profile: {
+        name: input.profile?.name || "",
+        bodyWeight: input.profile?.bodyWeight || ""
       },
       movements: mergeExerciseLibrary(input.movements.map((movement) => ({
         id: movement.id || makeId(),
@@ -2101,25 +2762,36 @@
       workouts: Array.isArray(input.workouts) ? input.workouts.map((workout) => ({
         id: workout.id || makeId(),
         name: workout.name || "Custom Workout",
+        category: workout.category || "General Strength",
         format: ["time", "amrap", "emom", "rounds", "custom"].includes(workout.format) ? workout.format : "time",
         rounds: workout.rounds || "",
         movements: Array.isArray(workout.movements)
           ? workout.movements.filter(Boolean).map(String)
           : String(workout.movements || "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean),
+        duration: workout.duration || workout.rounds || "Custom",
+        equipment: workout.equipment || "Custom",
+        goal: workout.goal || "Complete your saved custom workout.",
+        notes: workout.notes || "",
+        tags: Array.isArray(workout.tags) ? workout.tags.map(String) : ["custom"],
         createdAt: Number(workout.createdAt || Date.now())
       })) : [],
       workoutFavorites: Array.isArray(input.workoutFavorites)
-        ? input.workoutFavorites.filter((id) => Boolean(getDatabaseWorkout(id)))
+        ? input.workoutFavorites.filter(Boolean).map(String)
         : [],
       workoutHistory: Array.isArray(input.workoutHistory) ? input.workoutHistory.map((entry, index) => ({
         id: entry.id || makeId(),
         workoutId: entry.workoutId,
+        workoutName: entry.workoutName || workoutDatabase.find((workout) => workout.id === entry.workoutId)?.name || "",
+        source: entry.source || (String(entry.workoutId || "").startsWith("custom-") ? "custom" : "database"),
         completedAt: Number(entry.completedAt || Date.now() + index),
         date: entry.date || localDate(),
         checked: Array.isArray(entry.checked) ? entry.checked.map(Number).filter(Number.isFinite) : [],
+        results: entry.results && typeof entry.results === "object" ? entry.results : {},
         result: entry.result || "",
-        elapsedSeconds: Number.isFinite(Number(entry.elapsedSeconds)) ? Number(entry.elapsedSeconds) : null
-      })).filter((entry) => Boolean(getDatabaseWorkout(entry.workoutId))) : [],
+        elapsedSeconds: Number.isFinite(Number(entry.elapsedSeconds)) ? Number(entry.elapsedSeconds) : null,
+        workoutSnapshot: entry.workoutSnapshot || null
+      })) : [],
+      todayWorkout: normalizeTodayWorkout(input.todayWorkout),
       logs: input.logs.map((log, index) => ({
         id: log.id || makeId(),
         movementId: log.movementId,
@@ -2147,6 +2819,30 @@
         .filter((set) => set.reps || set.weight);
     }
     return normalized;
+  }
+
+  function normalizeTodayWorkout(workout) {
+    if (!workout || typeof workout !== "object" || !Array.isArray(workout.exercises)) return null;
+    return {
+      date: workout.date || localDate(),
+      source: workout.source === "database" ? "database" : "custom",
+      workoutId: workout.workoutId || "",
+      name: workout.name || "Today's Workout",
+      category: workout.category || "Custom",
+      difficulty: workout.difficulty || "",
+      duration: workout.duration || "",
+      equipment: workout.equipment || "",
+      goal: workout.goal || "",
+      notes: workout.notes || "",
+      tags: Array.isArray(workout.tags) ? workout.tags.map(String) : [],
+      exercises: workout.exercises.map((exercise) => ({
+        name: exercise.name || "Exercise",
+        prescription: exercise.prescription || ""
+      })),
+      checked: Array.isArray(workout.checked) ? workout.checked.map(Number).filter(Number.isFinite) : [],
+      results: workout.results && typeof workout.results === "object" ? workout.results : {},
+      startedAt: Number.isFinite(Number(workout.startedAt)) ? Number(workout.startedAt) : null
+    };
   }
 
   function saveState() {
@@ -2230,13 +2926,37 @@
     return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   }
 
-  function workoutTemplate(id, name, category, difficulty, duration, lines, notes) {
+  function workoutGroup(category, equipment, tags, workouts) {
+    return { category, equipment, tags, workouts };
+  }
+
+  function buildWorkoutDatabase() {
+    return workoutBlueprints.flatMap((group) => group.workouts.map((workout) => {
+      const [name, difficulty, duration, goal, lines, notes, extraTags = []] = workout;
+      return workoutTemplate({
+        id: `db-${slugify(`${group.category}-${name}`)}`,
+        name,
+        category: group.category,
+        difficulty,
+        duration,
+        equipment: group.equipment,
+        goal,
+        lines,
+        notes: notes || "Complete with quality movement. Record loads, times, or notes after training.",
+        tags: [...group.tags, ...extraTags, difficulty.toLowerCase()]
+      });
+    }));
+  }
+
+  function workoutTemplate({ id, name, category, difficulty, duration, equipment, goal, lines, notes, tags }) {
     return {
       id,
       name,
       category,
       difficulty,
       duration,
+      equipment,
+      goal,
       exercises: lines.map((line) => {
         const parts = line.split(",");
         return {
@@ -2244,8 +2964,16 @@
           prescription: parts.join(",").trim() || "Complete with quality reps"
         };
       }),
-      notes
+      notes,
+      tags: Array.from(new Set(tags || []))
     };
+  }
+
+  function slugify(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
   }
 
   function debounce(fn, wait) {

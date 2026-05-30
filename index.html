@@ -39,7 +39,108 @@
         </article>
       </section>
 
-      <section class="view is-active" id="trackView" data-view="track">
+      <section class="view is-active" id="todayView" data-view="today">
+        <div class="section-heading">
+          <div>
+            <h2>Workout of the Day</h2>
+            <p>Choose a workout or build your own.</p>
+          </div>
+        </div>
+
+        <section class="panel today-picker" id="todayPicker">
+          <button class="primary-button" id="chooseWorkoutDatabase" type="button">Choose Workout</button>
+          <button class="secondary-button" id="createCustomTodayWorkout" type="button">Create Custom Workout</button>
+        </section>
+
+        <section class="panel today-custom-builder" id="todayCustomBuilder" hidden>
+          <div class="section-heading compact">
+            <h2>Create Custom Workout</h2>
+          </div>
+          <label class="field">
+            <span>Workout name</span>
+            <input type="text" id="todayWorkoutName" placeholder="Today's workout">
+          </label>
+          <label class="field">
+            <span>Category</span>
+            <select id="todayWorkoutCategory"></select>
+          </label>
+          <div class="today-add-exercise">
+            <label class="field">
+              <span>Exercise</span>
+              <select id="todayExerciseSelect"></select>
+            </label>
+            <div class="structured-workout-fields" aria-label="Exercise prescription">
+              <label class="field compact-field">
+                <span>Rounds</span>
+                <input type="number" id="todayExerciseRounds" min="0" inputmode="numeric" placeholder="4">
+              </label>
+              <label class="field compact-field">
+                <span>Sets</span>
+                <input type="number" id="todayExerciseSets" min="0" inputmode="numeric" placeholder="3">
+              </label>
+              <label class="field compact-field">
+                <span>Reps</span>
+                <input type="number" id="todayExerciseReps" min="0" inputmode="numeric" placeholder="10">
+              </label>
+              <label class="field compact-field">
+                <span>Time</span>
+                <input type="text" id="todayExerciseTime" inputmode="decimal" placeholder="30 sec">
+              </label>
+              <label class="field compact-field">
+                <span>Weight</span>
+                <input type="text" id="todayExerciseWeight" inputmode="decimal" placeholder="135 lb">
+              </label>
+              <label class="field compact-field">
+                <span>Rest</span>
+                <input type="text" id="todayExerciseRest" inputmode="decimal" placeholder="60 sec">
+              </label>
+            </div>
+            <label class="field">
+              <span>Extra notes</span>
+              <input type="text" id="todayExerciseNotes" placeholder="Optional notes">
+            </label>
+            <button class="secondary-button" id="addTodayExercise" type="button">Add Exercise</button>
+          </div>
+          <div class="today-builder-list" id="todayBuilderList"></div>
+          <div class="button-row">
+            <button class="primary-button" id="saveTodayCustomWorkout" type="button">Save as Today's Workout</button>
+            <button class="secondary-button" id="cancelTodayCustomWorkout" type="button">Cancel</button>
+          </div>
+        </section>
+
+        <section class="panel today-active" id="todayActiveWorkout" hidden></section>
+
+        <section class="workout-detail panel" id="databaseWorkoutDetail" hidden></section>
+
+        <section id="workoutBrowse" hidden>
+          <button class="secondary-button browse-close-button" id="closeWorkoutBrowse" type="button">Close Workout Database</button>
+          <label class="field">
+            <span>Search workouts</span>
+            <input type="search" id="workoutSearch" placeholder="Search jump, strength, conditioning...">
+          </label>
+
+          <div class="library-tabs workout-difficulty-tabs" id="workoutDifficultyFilters" aria-label="Workout difficulty filters"></div>
+          <div class="chip-row" id="workoutCategoryFilters" aria-label="Workout categories"></div>
+
+          <section class="quick-section">
+            <div class="section-heading compact">
+              <h2>Favorites</h2>
+            </div>
+            <div class="chip-row" id="favoriteWorkoutChips"></div>
+          </section>
+
+          <section class="quick-section">
+            <div class="section-heading compact">
+              <h2>Recently Completed</h2>
+            </div>
+            <div class="chip-row" id="recentWorkoutChips"></div>
+          </section>
+
+          <div class="database-workout-list" id="databaseWorkoutList"></div>
+        </section>
+      </section>
+
+      <section class="view" id="trackView" data-view="track">
         <div class="section-heading">
           <div>
             <h2>Log Workout</h2>
@@ -129,48 +230,11 @@
         <div class="result-list" id="movementHistory"></div>
       </section>
 
-      <section class="view" id="workoutsView" data-view="workouts">
+      <section class="view" id="movementsView" data-view="add">
         <div class="section-heading">
           <div>
-            <h2>Workouts</h2>
-            <p>Pick a workout, train, and log it.</p>
-          </div>
-        </div>
-
-        <section class="workout-detail panel" id="databaseWorkoutDetail" hidden></section>
-
-        <section id="workoutBrowse">
-          <label class="field">
-            <span>Search workouts</span>
-            <input type="search" id="workoutSearch" placeholder="Search jump, strength, conditioning...">
-          </label>
-
-          <div class="library-tabs workout-difficulty-tabs" id="workoutDifficultyFilters" aria-label="Workout difficulty filters"></div>
-          <div class="chip-row" id="workoutCategoryFilters" aria-label="Workout categories"></div>
-
-          <section class="quick-section">
-            <div class="section-heading compact">
-              <h2>Favorites</h2>
-            </div>
-            <div class="chip-row" id="favoriteWorkoutChips"></div>
-          </section>
-
-          <section class="quick-section">
-            <div class="section-heading compact">
-              <h2>Recently Completed</h2>
-            </div>
-            <div class="chip-row" id="recentWorkoutChips"></div>
-          </section>
-
-          <div class="database-workout-list" id="databaseWorkoutList"></div>
-        </section>
-      </section>
-
-      <section class="view" id="movementsView" data-view="movements">
-        <div class="section-heading">
-          <div>
-            <h2>Exercises</h2>
-            <p>Add movements, favorites, and benchmarks.</p>
+            <h2>Add Exercises</h2>
+            <p>Add a movement to your exercise library.</p>
           </div>
         </div>
 
@@ -182,9 +246,23 @@
           </label>
           <label class="field">
             <span>Category</span>
-            <input type="text" id="movementCategory" placeholder="Strength, cardio, benchmark...">
+            <select id="movementCategory">
+              <option value="Strength">Strength</option>
+              <option value="Olympic Lifting">Olympic Lifting</option>
+              <option value="Bodyweight">Bodyweight</option>
+              <option value="Cardio">Cardio</option>
+              <option value="Conditioning">Conditioning</option>
+              <option value="Core">Core</option>
+              <option value="Mobility">Mobility</option>
+              <option value="Plyometrics">Plyometrics</option>
+              <option value="Dumbbell">Dumbbell</option>
+              <option value="Kettlebell">Kettlebell</option>
+              <option value="Machine">Machine</option>
+              <option value="Sports Performance">Sports Performance</option>
+              <option value="Benchmark">Benchmark</option>
+            </select>
           </label>
-          <label class="field">
+          <label class="field" hidden>
             <span>Main progress number</span>
             <select id="movementPrimaryMetric">
               <option value="estimatedMax">Estimated max</option>
@@ -194,11 +272,11 @@
               <option value="distance">Distance</option>
             </select>
           </label>
-          <label class="favorite-toggle">
+          <label class="favorite-toggle" hidden>
             <input type="checkbox" id="movementFavorite">
             <span>Favorite exercise</span>
           </label>
-          <fieldset class="metric-picker">
+          <fieldset class="metric-picker" hidden>
             <legend>Fields to show when logging</legend>
             <label><input type="checkbox" name="metric" value="sets" checked> Sets</label>
             <label><input type="checkbox" name="metric" value="reps" checked> Reps</label>
@@ -212,14 +290,14 @@
           </div>
         </form>
 
-        <section class="benchmark-panel">
+        <section class="benchmark-panel" hidden>
           <div class="section-heading compact">
             <h2>Benchmark Workouts</h2>
           </div>
           <div class="chip-row" id="benchmarkButtons"></div>
         </section>
 
-        <section class="panel workout-builder">
+        <section class="panel workout-builder" hidden>
           <details id="workoutBuilderDetails">
             <summary>
               <span>
@@ -232,6 +310,10 @@
             <label class="field">
               <span>Workout name</span>
               <input type="text" id="workoutName" placeholder="4 rounds for time" required>
+            </label>
+            <label class="field">
+              <span>Category</span>
+              <select id="workoutCategory"></select>
             </label>
             <div class="workout-form-grid">
               <label class="field">
@@ -253,6 +335,39 @@
               <span>Movements</span>
               <textarea id="workoutMovements" rows="4" placeholder="10 burpees&#10;20 push-ups&#10;50 air squats" required></textarea>
             </label>
+            <div class="structured-builder">
+              <label class="field">
+                <span>Add exercise</span>
+                <select id="workoutMovementSelect"></select>
+              </label>
+              <div class="structured-workout-fields" aria-label="Custom workout exercise prescription">
+                <label class="field compact-field">
+                  <span>Rounds</span>
+                  <input type="number" id="workoutMoveRounds" min="0" inputmode="numeric" placeholder="4">
+                </label>
+                <label class="field compact-field">
+                  <span>Sets</span>
+                  <input type="number" id="workoutMoveSets" min="0" inputmode="numeric" placeholder="3">
+                </label>
+                <label class="field compact-field">
+                  <span>Reps</span>
+                  <input type="number" id="workoutMoveReps" min="0" inputmode="numeric" placeholder="10">
+                </label>
+                <label class="field compact-field">
+                  <span>Time</span>
+                  <input type="text" id="workoutMoveTime" inputmode="decimal" placeholder="30 sec">
+                </label>
+                <label class="field compact-field">
+                  <span>Weight</span>
+                  <input type="text" id="workoutMoveWeight" inputmode="decimal" placeholder="135 lb">
+                </label>
+                <label class="field compact-field">
+                  <span>Rest</span>
+                  <input type="text" id="workoutMoveRest" inputmode="decimal" placeholder="60 sec">
+                </label>
+              </div>
+              <button class="secondary-button" id="addWorkoutMovement" type="button">Add Movement</button>
+            </div>
             <div class="button-row">
               <button class="primary-button" type="submit">Save Workout</button>
               <button class="secondary-button" type="button" id="cancelWorkoutEdit">Cancel</button>
@@ -262,7 +377,7 @@
           <div class="workout-list" id="workoutList"></div>
         </section>
 
-        <section class="library-panel">
+        <section class="library-panel" hidden>
           <div class="section-heading compact">
             <div>
               <h2>Exercise Library</h2>
@@ -281,19 +396,31 @@
           </section>
         </section>
 
-        <div class="movement-list" id="movementList"></div>
+        <div class="movement-list" id="movementList" hidden></div>
       </section>
 
       <section class="view" id="settingsView" data-view="settings">
         <div class="section-heading">
           <div>
             <h2>Settings</h2>
-            <p>Display, units, and backups.</p>
+            <p>Profile, preferences, stats, and backups.</p>
           </div>
         </div>
 
         <section class="panel settings-stack">
-          <h3>App Preferences</h3>
+          <h3>Profile</h3>
+          <label class="field">
+            <span>Name</span>
+            <input type="text" id="profileName" placeholder="Your name">
+          </label>
+          <label class="field">
+            <span>Body Weight</span>
+            <input type="number" id="profileBodyWeight" min="0" inputmode="decimal" placeholder="185">
+          </label>
+        </section>
+
+        <section class="panel settings-stack">
+          <h3>Preferences</h3>
           <label class="setting-row">
             <span>Dark mode</span>
             <input type="checkbox" id="darkModeToggle">
@@ -305,16 +432,40 @@
               <option value="kg">Kilograms (kg)</option>
             </select>
           </label>
-          <p class="device-note">Your workout data is saved on this device only. Export a backup if you switch phones or browsers.</p>
+        </section>
+
+        <section class="panel settings-stack">
+          <h3>Statistics</h3>
+          <div class="settings-stat-grid">
+            <article><span id="statTotalWorkouts">0</span><p>Total Workouts Completed</p></article>
+            <article><span id="statTotalExercises">0</span><p>Total Exercises Logged</p></article>
+            <article><span id="statTotalPrs">0</span><p>Total PRs Achieved</p></article>
+            <article><span id="statCurrentStreak">0</span><p>Current Workout Streak</p></article>
+            <article><span id="statLongestStreak">0</span><p>Longest Workout Streak</p></article>
+            <article><span id="statFavoriteExercise">--</span><p>Favorite Exercise</p></article>
+            <article><span id="statTopCategory">--</span><p>Most Used Workout Category</p></article>
+            <article><span id="statFirstWorkoutDate">--</span><p>First Workout Date</p></article>
+          </div>
         </section>
 
         <section class="panel backup-panel">
+          <h3>Data</h3>
           <button class="primary-button" id="exportData" type="button">Export Backup</button>
           <label class="secondary-button file-button">
             Import Backup
             <input type="file" id="importData" accept="application/json">
           </label>
           <button class="danger-button" id="clearData" type="button">Clear All Data</button>
+          <p class="device-note">Your workout data is stored on this device only. Export a backup before switching devices or browsers.</p>
+        </section>
+
+        <section class="panel settings-stack">
+          <h3>About</h3>
+          <div class="about-list">
+            <p><strong>Workout Tracker</strong></p>
+            <p>Version 1.0</p>
+            <p>Built for tracking strength, CrossFit, basketball performance, conditioning, mobility, and general fitness.</p>
+          </div>
         </section>
       </section>
     </main>
@@ -322,10 +473,9 @@
     <button class="sticky-save" id="stickySaveResult" type="button">Save Result</button>
 
     <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="is-active" data-nav="track">Log</button>
+      <button class="is-active" data-nav="today">Today</button>
       <button data-nav="progress">Progress</button>
-      <button data-nav="workouts">Workouts</button>
-      <button data-nav="movements">Exercises</button>
+      <button data-nav="add">Add Exercises</button>
       <button data-nav="settings">Settings</button>
     </nav>
   </div>
